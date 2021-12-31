@@ -1,0 +1,21 @@
+{
+    "KEYPATH" : "",
+
+    "DATA_CENTER_NAME" : "",
+    "TABLE_NAME" : "",
+
+    "DATALAB_INFO" : [
+        {
+            "CLIENT_ID" : "", 
+            "CLIENT_SECRET" : ""
+        }
+    ],
+
+    "SEARCHAD_INFO" : [
+        {
+            "CUSTOMER_ID" : "",
+            "SECRET_KEY" : "",
+            "ACCESS_LICENCE" : ""
+        }
+    ]
+}
