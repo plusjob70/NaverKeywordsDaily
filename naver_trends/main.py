@@ -1,5 +1,6 @@
 #! python
 import os
+from constant import IS_DANGEROUS_TIME
 from uinfo import *
 from keywordanal import Keywordanal
 from google.cloud import bigquery
@@ -7,6 +8,11 @@ import pandas as pd
 import queries
 
 if __name__ == '__main__':
+    # check if it is dangerous time
+    if (IS_DANGEROUS_TIME):
+        print('Deny access to the server. It is a dangerous time.')
+        exit()
+
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = KEYPATH
     client_list = os.listdir('../data')
 
