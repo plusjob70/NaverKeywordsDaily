@@ -57,9 +57,9 @@ class Keywordstrend:
             return None, None, e.code
 
 if __name__ == '__main__':
-    client_id = '1ROE_b4RJosRov15xu2I'
-    client_secret = 'qfJGzEE4jl'
-    keyword_list = ['전시저널']
+    client_id = ''
+    client_secret = ''
+    keyword_list = ['']
 
     kt = Keywordstrend(client_id=client_id, client_secret=client_secret, keyword_list=keyword_list)
 
