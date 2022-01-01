@@ -1,11 +1,11 @@
 #! python
 import os
-from constant import IS_DANGEROUS_TIME
-from uinfo import *
+import pandas as pd
+import common.queries as queries
+from common.constant import IS_DANGEROUS_TIME
+from common.uinfo import *
 from keywordanal import Keywordanal
 from google.cloud import bigquery
-import pandas as pd
-import queries
 
 if __name__ == '__main__':
     # check if it is dangerous time

@@ -1,7 +1,9 @@
-import urllib.request as UR
-from datetime import date, timedelta
+import sys 
 import json
-from constant import START_DATE, DAY_DIFF, DEFAULT_LATEST_DATE
+import urllib.request as UR
+sys.path.append('../')
+from datetime import date, timedelta
+from common.constant import START_DATE, DAY_DIFF, DEFAULT_LATEST_DATE
 
 class Keywordstrend:
     def __init__(self, client_id : str, client_secret : str, keyword_list=None):
@@ -57,4 +59,20 @@ class Keywordstrend:
             return None, None, e.code
 
 if __name__ == '__main__':
-    pass
+    from pprint import pprint
+
+    client_id = ''
+    client_secret = ''
+    keyword_list = ['']
+
+    kt = Keywordstrend(client_id=client_id, client_secret=client_secret, keyword_list=keyword_list)
+
+    request = UR.Request(kt.url)
+    request.add_header('X-Naver-Client-Id', kt.client_id)
+    request.add_header('X-Naver-Client-Secret', kt.client_secret)
+    request.add_header('Content-Type', 'application/json')
+
+    response = UR.urlopen(request, data=kt.generate_body('pc'))
+    results = json.loads(response.read()).get('results')
+
+    pprint(results)

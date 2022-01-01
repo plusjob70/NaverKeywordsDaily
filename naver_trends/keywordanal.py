@@ -1,7 +1,7 @@
 from datalab.keywordstrend import Keywordstrend
 from searchad.relkwdstat import RelKwdStat
-from uinfo import *
-from constant import *
+from common.uinfo import *
+from common.constant import *
 
 class Keywordanal:
     def __init__(self):
@@ -31,13 +31,14 @@ class Keywordanal:
         dmc, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=latest_date_dict.get('mo', None))
             
         while (pc_res_code == 429 | mo_res_code == 429):
-            self.client_idx += 1
             try:
+                print("This user has exceeded the limit of the number of requests. Requesting new user...")
+                self.client_idx += 1
                 kt = Keywordstrend(CLIENT_LIST[self.client_idx][ID], CLIENT_LIST[self.client_idx][SECRET], keyword_list)
                 dpc, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=latest_date_dict.get('pc', None))
                 dmc, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=latest_date_dict.get('mo', None))
             except IndexError:
-                print('All clients are exhausted')
+                print('All users are exhausted')
                 print('Cannot analyze : {}'.format(keyword_list))
                 exit()
 
@@ -64,3 +65,6 @@ class Keywordanal:
             keyword_dict[keyword]['dmc'] = dict(zip(list(keyword_dict[keyword]['dmc'].keys()), dmc))
 
         return keyword_dict
+        
+if __name__ == '__main__':
+    pass
