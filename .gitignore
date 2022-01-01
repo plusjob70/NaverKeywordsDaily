@@ -1,11 +1,5 @@
-<<<<<<< HEAD
-./naver_trends/env/
-./setting.json
-./data/
-=======
 /naver_trends/env/
 *.json
 /data
 __pycache__/
 *.py[cod]
->>>>>>> dev
