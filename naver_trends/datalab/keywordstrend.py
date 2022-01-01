@@ -1,6 +1,8 @@
-import urllib.request as UR
-from datetime import date, timedelta
+import sys 
 import json
+import urllib.request as UR
+sys.path.append('../')
+from datetime import date, timedelta
 from common.constant import START_DATE, DAY_DIFF, DEFAULT_LATEST_DATE
 
 class Keywordstrend:
@@ -57,6 +59,8 @@ class Keywordstrend:
             return None, None, e.code
 
 if __name__ == '__main__':
+    from pprint import pprint
+
     client_id = ''
     client_secret = ''
     keyword_list = ['']
@@ -71,4 +75,4 @@ if __name__ == '__main__':
     response = UR.urlopen(request, data=kt.generate_body('pc'))
     results = json.loads(response.read()).get('results')
 
-    print(results)
+    pprint(results)
