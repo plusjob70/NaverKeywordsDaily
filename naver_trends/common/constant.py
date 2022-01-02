@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 PC = 0
 MO = 1
@@ -8,6 +8,7 @@ SECRET  = 1
 LICENSE = 2
 
 IS_DANGEROUS_TIME   = '00:00' < datetime.now().strftime('%H:%M') < '10:30'
+YESTERDAY           = datetime.now() - timedelta(days=1, hours=10, minutes=30)
 DEFAULT_LATEST_DATE = '2015-12-31'
 START_DATE          = datetime(2016, 1, 1).date()
 DAY_DIFF            = (datetime.now() - datetime(2016, 1, 1, 10, 30, 0)).days
