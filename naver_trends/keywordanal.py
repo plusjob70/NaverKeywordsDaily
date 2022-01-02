@@ -10,10 +10,10 @@ class Keywordanal:
 
     def list_to_dict(self, keyword_list, latest_date_dict={}) -> dict:
         '''
-            dpc : Daily   Pc     Click
-            dpr : Daily   Pc     Ratio
-            mpc : Monthly Pc     Click
-            mpr : Monthly Pc     Ratio
+            dpc : Daily   PC     Click
+            dpr : Daily   PC     Ratio
+            mpc : Monthly PC     Click
+            mpr : Monthly PC     Ratio
             dmc : Daily   Mobile Click
             dmr : Daily   Mobile Ratio
             mmc : Monthly Mobile Click
