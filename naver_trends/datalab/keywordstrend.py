@@ -29,7 +29,8 @@ class Keywordstrend:
         request.add_header('Content-Type', 'application/json')
         
         try:
-            if (latest_date_dict != None):
+            # set oldest latest date
+            if (latest_date_dict is not None):
                 if (len(latest_date_dict) != len(self.keyword_list)):
                     oldest_latest_date = DEFAULT_START_DATE
                 else:
@@ -39,24 +40,28 @@ class Keywordstrend:
             else:
                 oldest_latest_date = DEFAULT_START_DATE
 
+            # request
             response = UR.urlopen(request, data=self.generate_body(device, oldest_latest_date.date()))
             res_code = response.getcode()
 
+            # initialize ratio_dict(Daily Ratio Dictionary) and mr_dict(Monthly Ratio Dictionary)
             ratio_dict = {keyword:dict for keyword in self.keyword_list}
             mr_dict    = {keyword:dict for keyword in self.keyword_list}
 
+            # initialize zero_dict for mr_dict
             if (oldest_latest_date + timedelta(days=30) > YESTERDAY):
                 zero_dict = {str(YESTERDAY.date() - timedelta(day)):0 for day in range(30)}
             else:
                 day_diff  = (NOW - oldest_latest_date).days
                 zero_dict = {str(oldest_latest_date.date() + timedelta(days=day)):0 for day in range(day_diff)}
 
+            # set ratio_dict and mr_dict
             results = json.loads(response.read()).get('results')
             for result in results:
                 keyword     = result.get('title')
                 latest_date = str(DEFAULT_LATEST_DATE)
 
-                if (latest_date_dict != None):
+                if (latest_date_dict is not None):
                     latest_date = latest_date_dict.get(keyword, latest_date)
 
                 dr_dict   = zero_dict.copy()
