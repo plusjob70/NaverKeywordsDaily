@@ -81,16 +81,17 @@ if __name__ == '__main__':
         # update table
         if (q_result.total_rows != 0):
             latest_date_dict = {}
-            
             for row in q_result:
                 if row.device_type not in latest_date_dict:
                     latest_date_dict[row.device_type] = {}
                 latest_date_dict[row.device_type][row.keyword] = row.latest_date
 
+            keyword_anal.set_latest_date_dict(latest_date_dict)
+
             df = pd.DataFrame(columns=df_columns)
             for chunk in sheet_data_list:
                 keyword_list = [row.get('keyword', None) for row in chunk]
-                keyword_dict = keyword_anal.list_to_dict(keyword_list, latest_date_dict)
+                keyword_dict = keyword_anal.get_keyword_anal_results(keyword_list)
                 print(keyword_list, flush=True)
 
                 for idx, row in enumerate(chunk):
@@ -134,9 +135,11 @@ if __name__ == '__main__':
 
         else:
             print('New table found.', flush=True)
+            keyword_anal.set_latest_date_dict(latest_date_dict={})
+
             for chunk in sheet_data_list:
                 keyword_list = [row.get('keyword', None) for row in chunk]
-                keyword_dict = keyword_anal.list_to_dict(keyword_list)
+                keyword_dict = keyword_anal.get_keyword_anal_results(keyword_list)
                 print(keyword_list, flush=True)
 
                 df = pd.DataFrame(columns=df_columns)
