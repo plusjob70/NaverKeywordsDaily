@@ -1,0 +1,12 @@
+corporate_id:STRING,
+brand_id:STRING,
+date:STRING,
+keyword:STRING,
+keyword_type:STRING,
+category_1:STRING,
+category_2:STRING,
+category_3:STRING,
+category_4:STRING,
+category_5:STRING,
+device_type:STRING,
+queries:INTEGER

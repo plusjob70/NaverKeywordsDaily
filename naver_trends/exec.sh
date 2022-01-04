@@ -17,6 +17,9 @@ else
     pip install --upgrade requests
     pip install --upgrade pandas
     pip install --upgrade google-cloud-bigquery
+    pip install --upgrade gspread
+    pip install --upgrade oauth2client
+    pip install --upgrade google-api-python-client
 fi
 
 python main.py
