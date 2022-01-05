@@ -1,0 +1,1 @@
+corporate_id	brand_id	keyword	keyword_type	category_1	category_2	category_3	category_4	category_5

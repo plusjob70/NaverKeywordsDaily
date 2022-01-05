@@ -11,7 +11,7 @@ from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
 if __name__ == '__main__':
-    # check if it is dangerous time
+    # check dangerous time
     if (IS_DANGEROUS_TIME):
         print('Deny access to the server. It is a dangerous time.')
         exit()
@@ -41,6 +41,7 @@ if __name__ == '__main__':
         'category_2', 'category_3', 'category_4', 'category_5', 'device_type', 'queries'
     ]
 
+    # BigQuery table columns
     selected_fields = [
         bigquery.SchemaField('corporate_id', 'STRING'),
         bigquery.SchemaField('brand_id', 'STRING'),
@@ -56,7 +57,7 @@ if __name__ == '__main__':
         bigquery.SchemaField('queries', 'INTEGER')
     ]
 
-    print('Start to analyze keywords...')
+    print('Start to analyze keywords...', flush=True)
     for client in client_info_dict:
         client_id   = client['id']
         client_name = client['name']
@@ -176,7 +177,7 @@ if __name__ == '__main__':
                 print('Inserting to BigQuery table...', flush=True)
                 i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=selected_fields)
 
-        if (type(i_result) == list):
+        if (type(i_result) is list):
             print('{} Done'.format(client_name), flush=True)
         else:
             print('{} Failed'.format(client_name), flush=True)
