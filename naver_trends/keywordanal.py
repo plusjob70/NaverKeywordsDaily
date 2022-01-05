@@ -5,10 +5,14 @@ from common.constant import *
 
 class Keywordanal:
     def __init__(self):
-        self.client_idx   = 0
-        self.customer_idx = 0
+        self.client_idx       = 0
+        self.customer_idx     = 0
+        self.latest_date_dict = {}
+    
+    def set_latest_date_dict(self, latest_date_dict):
+        self.latest_date_dict = latest_date_dict
 
-    def list_to_dict(self, keyword_list, latest_date_dict={}) -> dict:
+    def get_keyword_anal_results(self, keyword_list) -> dict:
         '''
             dpc : Daily   PC     Click
             dpr : Daily   PC     Ratio
@@ -27,16 +31,16 @@ class Keywordanal:
         rks = RelKwdStat(CUSTOMER_LIST[self.customer_idx][ID], CUSTOMER_LIST[self.customer_idx][LICENSE], CUSTOMER_LIST[self.customer_idx][SECRET], keyword_list)
 
         # get keywords trend
-        dpc, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=latest_date_dict.get('pc', None))
-        dmc, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=latest_date_dict.get('mo', None))
+        dpc, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=self.latest_date_dict.get('PC', None))
+        dmc, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=self.latest_date_dict.get('모바일', None))
             
         while (pc_res_code == 429 | mo_res_code == 429):
-            try:
-                print("This user has exceeded the limit of the number of requests. Requesting new user...")
+            try:                                                               
+                print("This user has exceeded the limit of the number of requests. Requesting new user...", flush=True)
                 self.client_idx += 1
                 kt = Keywordstrend(CLIENT_LIST[self.client_idx][ID], CLIENT_LIST[self.client_idx][SECRET], keyword_list)
-                dpc, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=latest_date_dict.get('pc', None))
-                dmc, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=latest_date_dict.get('mo', None))
+                dpc, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=self.latest_date_dict.get('PC', None))
+                dmc, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=self.latest_date_dict.get('모바일', None))
             except IndexError:
                 print('All users are exhausted')
                 print('Cannot analyze : {}'.format(keyword_list))

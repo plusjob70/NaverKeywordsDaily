@@ -1,7 +1,5 @@
-import sys 
 import json
 import urllib.request as UR
-sys.path.append('../')
 from datetime import date, timedelta, datetime
 from common.constant import *
 
