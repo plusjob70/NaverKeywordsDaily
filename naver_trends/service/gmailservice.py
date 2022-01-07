@@ -13,13 +13,12 @@ class GmailService:
         self.scopes   = ['https://www.googleapis.com/auth/gmail.send']
         self.sender   = 'data@enzinex.com'
         self.receiver = 'justin@enzinex.com'
-        self.subject  = f'{str(datetime.now())} NST Results'
 
     def create_message(self, message_text, status):
         message = MIMEText(message_text)
         message['from'] = self.sender
         message['to'] = self.receiver
-        message['subject'] = self.subject + ':' + status
+        message['subject'] = f'{str(datetime.now())} NST Results : ' + status
         return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
 
     def send_message(self, message):
