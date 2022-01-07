@@ -6,22 +6,30 @@ import common.queries as queries
 from common.constant import IS_DANGEROUS_TIME
 from common.uinfo import *
 from keywordanal import Keywordanal
+from service.gmailservice import GmailService
 from google.cloud import bigquery
 from googleapiclient.discovery import build
 from oauth2client.service_account import ServiceAccountCredentials
 
 if __name__ == '__main__':
+    msg    = []
+    text   = ''
+    status = 'succeeded'
+    gmail  = GmailService()
+
     # check dangerous time
     if (IS_DANGEROUS_TIME):
-        print('Deny access to the server. It is a dangerous time.')
+        text = 'Deny access to the server. It is a dangerous time.'
+        print(text)
+        gmail.send_message(gmail.create_message(text, 'failed'))
         exit()
 
     # set google application credentials for Bigquery
     os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = KEYPATH
 
     # authorize gsheet and gdrive
-    scope  = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    creds  = ServiceAccountCredentials.from_json_keyfile_name(KEYPATH, scope)
+    scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
+    creds  = ServiceAccountCredentials.from_json_keyfile_name(KEYPATH, scopes)
     gdrive = build('drive', 'v3', credentials=creds)
     gspd   = gspread.authorize(credentials=creds)
 
@@ -61,7 +69,9 @@ if __name__ == '__main__':
     for client in client_info_dict:
         client_id   = client['id']
         client_name = client['name']
-        print('Analyzing keywords for client:', client_name, flush=True)
+        text        = 'Analyzing keywords for client : {}'.format(client_name)
+        msg.append(text)
+        print(text, flush=True)
 
         # get sheet file
         sheet = gspd.open_by_key(client_id).sheet1.get_all_records()
@@ -127,7 +137,9 @@ if __name__ == '__main__':
                     df = pd.concat([df, pd.DataFrame(pc_data), pd.DataFrame(mo_data)])
 
             if (df.empty):
-                print('"{}" No change in data'.format(client_name), flush=True)
+                text = '"{}" No change in data'.format(client_name) 
+                print(text, flush=True)
+                msg.append(text)
                 continue
             else:
                 print(df, flush=True)
@@ -178,6 +190,12 @@ if __name__ == '__main__':
                 i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=selected_fields)
 
         if (type(i_result) is list):
-            print('{} Done'.format(client_name), flush=True)
+            text = '{} Done'.format(client_name)
         else:
-            print('{} Failed'.format(client_name), flush=True)
+            text = '{} Failed'.format(client_name)
+            status = 'failed'
+        print(text, flush = True)
+        msg.append(text)
+
+    msg ='\n'.join(msg)
+    gmail.send_message(gmail.create_message(msg, status))
