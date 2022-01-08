@@ -1,12 +1,17 @@
 {
     "KEYPATH" : "",
 
-    "DATA_CENTER_NAME" : "",
+    "OAUTHPATH" : "",
+    "TOKENPATH" : "",
+
+    "PROJECT_NAME" : "",
     "TABLE_NAME" : "",
+
+    "GDRIVE_DIR_NAME" : "",
 
     "DATALAB_INFO" : [
         {
-            "CLIENT_ID" : "", 
+            "CLIENT_ID" : "",
             "CLIENT_SECRET" : ""
         }
     ],
