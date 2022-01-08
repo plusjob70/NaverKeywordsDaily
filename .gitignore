@@ -1,5 +1,4 @@
 /naver_trends/env/
-*.json
 /data
 __pycache__/
 *.py[cod]
