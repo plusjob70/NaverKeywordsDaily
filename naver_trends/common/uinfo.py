@@ -5,6 +5,8 @@ with open('../setting.json', 'r') as setting:
 
 # Google service account key
 KEYPATH          = setting_dict.get('KEYPATH', None)
+OAUTHPATH        = setting_dict.get('OAUTHPATH', None)
+TOKENPATH        = setting_dict.get('TOKENPATH', None)
 
 # BigQuery dataset structure
 PROJECT_NAME     = setting_dict.get('PROJECT_NAME', None)
