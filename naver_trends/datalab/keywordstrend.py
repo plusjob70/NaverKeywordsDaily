@@ -71,7 +71,7 @@ class Keywordstrend:
             return ratio_dict, mr_dict, res_code
 
         except UR.HTTPError as e:
-            print('Http Error:', e.code)
+            # print('Http Error:', e.code)
             return None, None, e.code
 
 if __name__ == '__main__':
