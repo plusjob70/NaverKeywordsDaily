@@ -89,7 +89,6 @@ if __name__ == '__main__':
         try:
             table = bq.get_table(table_id)
         except NotFound:
-            time_out = 0
             table    = bq.create_table(bigquery.Table(table_id, schema=table_schema))
             text     = 'New table created : {}'.format(table_id)
             msg.append(text)
