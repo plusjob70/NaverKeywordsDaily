@@ -3,12 +3,14 @@ import os
 import gspread
 import pandas as pd
 import common.queries as queries
+from time import sleep
 from common.constant import IS_DANGEROUS_TIME
 from common.uinfo import *
 from keywordanal import Keywordanal
 from service.gmailservice import GmailService
 from google.cloud import bigquery
 from googleapiclient.discovery import build
+from google.cloud.exceptions import NotFound
 from oauth2client.service_account import ServiceAccountCredentials
 
 if __name__ == '__main__':
@@ -50,7 +52,7 @@ if __name__ == '__main__':
     ]
 
     # BigQuery table columns
-    selected_fields = [
+    table_schema = [
         bigquery.SchemaField('corporate_id', 'STRING'),
         bigquery.SchemaField('brand_id', 'STRING'),
         bigquery.SchemaField('date', 'STRING'),
@@ -82,7 +84,16 @@ if __name__ == '__main__':
         sheet_data_list = [sheet[i:i+5] for i in range(0, len(sheet), 5)]
         
         # get table infomation
-        table = bq.get_table(f'{PROJECT_NAME}.{client_name}.{TABLE_NAME}')
+        table     = None
+        table_id  = f'{PROJECT_NAME}.{client_name}.{TABLE_NAME}'
+        try:
+            table = bq.get_table(table_id)
+        except NotFound:
+            time_out = 0
+            table    = bq.create_table(bigquery.Table(table_id, schema=table_schema))
+            text     = 'New table created : {}'.format(table_id)
+            msg.append(text)
+            print(text, flush=True)
 
         # find latest date
         q = queries.find_latest_date.format(PROJECT_NAME, client_name, TABLE_NAME)
@@ -144,10 +155,11 @@ if __name__ == '__main__':
             else:
                 print(df, flush=True)
                 print('Inserting to BigQuery table...', flush=True)
-                i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=selected_fields)
+                i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=table_schema)
 
         else:
             print('New table found.', flush=True)
+            time_out = 0
             keyword_anal.set_latest_date_dict(latest_date_dict={})
 
             for chunk in sheet_data_list:
@@ -187,7 +199,21 @@ if __name__ == '__main__':
                     }
                     df = pd.concat([df, pd.DataFrame(pc_data), pd.DataFrame(mo_data)])
                 print('Inserting to BigQuery table...', flush=True)
-                i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=selected_fields)
+
+                while (True):
+                    try:
+                        i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=table_schema)
+                        break
+                    except NotFound:
+                        print('not found table because of delay. please wait...', flush=True)
+                        time_out += 1
+                        sleep(0.5)
+                        if (time_out > 50):
+                            text = '"{}" BigQuery table not found'.format(client_name)
+                            print(text, flush=True)
+                            gmail.send_message(gmail.create_message(text, 'failed'))
+                            exit()
+                        continue
 
         if (type(i_result) is list):
             text = '{} Done'.format(client_name)
