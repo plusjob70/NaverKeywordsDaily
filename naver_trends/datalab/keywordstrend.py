@@ -32,7 +32,7 @@ class Keywordstrend:
                 if (len(latest_date_dict) != len(self.keyword_list)):
                     oldest_latest_date = DEFAULT_START_DATE
                 else:
-                    oldest_latest_date = datetime.strptime(min(latest_date_dict.values()), '%Y-%m-%d') + timedelta(hours=10, minutes=30)
+                    oldest_latest_date = datetime.strptime(min(latest_date_dict.values()), '%Y-%m-%d') + timedelta(hours=10, minutes=0)
                     if (oldest_latest_date + timedelta(days=30) > YESTERDAY):
                         oldest_latest_date = YESTERDAY - timedelta(days=29)
             else:
