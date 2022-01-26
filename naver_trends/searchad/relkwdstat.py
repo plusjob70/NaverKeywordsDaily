@@ -37,7 +37,7 @@ class RelKwdStat:
         response_code = response.status_code
 
         if (response_code == 200):
-            click_count_dict = {keyword:[None, None] for keyword in self.keyword_list}
+            click_count_dict = {keyword:[0, 0] for keyword in self.keyword_list}
             results = response.json().get('keywordList')
 
             for result in results:
@@ -45,9 +45,9 @@ class RelKwdStat:
                 if (rel_keyword in self.keyword_list):
                     mpc = result.get('monthlyPcQcCnt')
                     mmc = result.get('monthlyMobileQcCnt')
-
-                    click_count_dict[rel_keyword][0] = mpc if (type(mpc) == int) else 0
-                    click_count_dict[rel_keyword][1] = mmc if (type(mmc) == int) else 0
+                    
+                    if (type(mpc) is int): click_count_dict[rel_keyword][0] = mpc
+                    if (type(mmc) is int): click_count_dict[rel_keyword][1] = mmc
                 else:
                     break
             return click_count_dict, 200

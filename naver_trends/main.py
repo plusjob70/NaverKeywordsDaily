@@ -6,7 +6,7 @@ import common.queries as queries
 from time import sleep
 from common.constant import IS_DANGEROUS_TIME
 from common.uinfo import *
-from keywordanal import Keywordanal
+from keywordanal.keywordanal import Keywordanal
 from service.gmailservice import GmailService
 from google.cloud import bigquery
 from googleapiclient.discovery import build

@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 
+Q = '\"'
+
 PC = 0
 MO = 1
 
