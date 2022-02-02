@@ -1,71 +1,54 @@
 #! python
-import os
-import gspread
 import pandas as pd
-import common.queries as queries
 from time import sleep
-from common.constant import IS_DANGEROUS_TIME
-from common.uinfo import *
-from keywordanal.keywordanal import Keywordanal
-from service.gmailservice import GmailService
-from google.cloud import bigquery
-from googleapiclient.discovery import build
+from naver_trends.common.constant import IS_DANGEROUS_TIME
+from naver_trends.keywordanal.keywordanal import Keywordanal
+from naver_trends.service.gmailservice import GmailService
+from naver_trends.service.bigqueryservice import BigQueryService
+from naver_trends.service.gsheetsservice import GSheetsService
 from google.cloud.exceptions import NotFound
-from oauth2client.service_account import ServiceAccountCredentials
+
 
 if __name__ == '__main__':
     msg    = []
     text   = ''
     status = 'succeeded'
-    gmail  = GmailService()
+
+    # create GmailService instance
+    #gmail  = GmailService()
 
     # check dangerous time
     if (IS_DANGEROUS_TIME):
         text = 'Deny access to the server. It is a dangerous time.'
         print(text)
-        gmail.send_message(gmail.create_message(text, 'failed'))
+        #gmail.send_message(gmail.create_message(text, 'failed'))
         exit()
 
-    # set google application credentials for Bigquery
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = KEYPATH
+    # BigQuery table schema
+    schema = {
+        'corporate_id': 'STRING',
+        'brand_id'    : 'STRING',
+        'date'        : 'STRING',
+        'keyword'     : 'STRING',
+        'keyword_type': 'STRING',
+        'category_1'  : 'STRING',
+        'category_2'  : 'STRING',
+        'category_3'  : 'STRING',
+        'category_4'  : 'STRING',
+        'category_5'  : 'STRING',
+        'device_type' : 'STRING',
+        'queries'     : 'INTEGER'
+    }
+    # dataframe columns
+    df_columns   = schema.keys()
 
-    # authorize gsheet and gdrive
-    scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    creds  = ServiceAccountCredentials.from_json_keyfile_name(KEYPATH, scopes)
-    gdrive = build('drive', 'v3', credentials=creds)
-    gspd   = gspread.authorize(credentials=creds)
-
-    # get client file info (id, name)
-    nst_data_id      = gdrive.files().list(q=f'name=\'{GDRIVE_DIR_NAME}\'').execute().get('files')[0].get('id')
-    client_info_dict = gdrive.files().list(q=f'\'{nst_data_id}\' in parents', fields='files(id, name)', pageSize=1000).execute().get('files')
-
-    # keyword analysis tool
+    # create BigQueryService & GSheetsService & keyword anal tool instance
+    bigquery     = BigQueryService(schema=schema)
+    gsheets      = GSheetsService()
     keyword_anal = Keywordanal()
 
-    # BigQuery client
-    bq = bigquery.Client()
-
-    # dataframe columns
-    df_columns = [
-        'corporate_id', 'brand_id', 'date', 'keyword', 'keyword_type', 'category_1',
-        'category_2', 'category_3', 'category_4', 'category_5', 'device_type', 'queries'
-    ]
-
-    # BigQuery table columns
-    table_schema = [
-        bigquery.SchemaField('corporate_id', 'STRING'),
-        bigquery.SchemaField('brand_id', 'STRING'),
-        bigquery.SchemaField('date', 'STRING'),
-        bigquery.SchemaField('keyword', 'STRING'),
-        bigquery.SchemaField('keyword_type', 'STRING'),
-        bigquery.SchemaField('category_1', 'STRING'),
-        bigquery.SchemaField('category_2', 'STRING'),
-        bigquery.SchemaField('category_3', 'STRING'),
-        bigquery.SchemaField('category_4', 'STRING'),
-        bigquery.SchemaField('category_5', 'STRING'),
-        bigquery.SchemaField('device_type', 'STRING'),
-        bigquery.SchemaField('queries', 'INTEGER')
-    ]
+    # get client file info (id, name)
+    client_info_dict = gsheets.get_all_files_info()
 
     print('Start to analyze keywords...', flush=True)
     for client in client_info_dict:
@@ -76,7 +59,7 @@ if __name__ == '__main__':
         print(text, flush=True)
 
         # get sheet file
-        sheet = gspd.open_by_key(client_id).sheet1.get_all_records()
+        sheet = gsheets.get_sheet(id=client_id)
 
         # preprocess sheet data
         for idx in range(len(sheet)):
@@ -84,25 +67,16 @@ if __name__ == '__main__':
         sheet_data_list = [sheet[i:i+5] for i in range(0, len(sheet), 5)]
         
         # get table infomation
-        table     = None
-        table_id  = f'{PROJECT_NAME}.{client_name}.{TABLE_NAME}'
-        try:
-            table = bq.get_table(table_id)
-        except NotFound:
-            table    = bq.create_table(bigquery.Table(table_id, schema=table_schema))
-            text     = 'New table created : {}'.format(table_id)
-            msg.append(text)
-            print(text, flush=True)
+        table = bigquery.get_table_info(client_name)
 
         # find latest date
-        q = queries.find_latest_date.format(PROJECT_NAME, client_name, TABLE_NAME)
-        q_result = bq.query(q).result()
-        i_result = None
+        num_rows, s_result = bigquery.get_latest_date_dict(client_name)
 
         # update table
-        if (q_result.total_rows != 0):
+        i_result = None
+        if (num_rows != 0):
             latest_date_dict = {}
-            for row in q_result:
+            for row in s_result:
                 if row.device_type not in latest_date_dict:
                     latest_date_dict[row.device_type] = {}
                 latest_date_dict[row.device_type][row.keyword] = row.latest_date
@@ -130,7 +104,7 @@ if __name__ == '__main__':
                         'device_type' : 'PC',
                         'queries'     : keyword_dict[keyword_list[idx]]['dpc'].values()
                     }
-                    mo_data ={
+                    mo_data = {
                         'corporate_id': row['corporate_id'],
                         'brand_id'    : row['brand_id'],
                         'date'        : keyword_dict[keyword_list[idx]]['dmc'].keys(),
@@ -154,7 +128,7 @@ if __name__ == '__main__':
             else:
                 print(df, flush=True)
                 print('Inserting to BigQuery table...', flush=True)
-                i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=table_schema)
+                i_result = bigquery.client.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=bigquery.table_schema)
 
         else:
             print('New table found.', flush=True)
@@ -182,7 +156,7 @@ if __name__ == '__main__':
                         'device_type' : 'PC',
                         'queries'     : keyword_dict[keyword_list[idx]]['dpc'].values()
                     }
-                    mo_data ={
+                    mo_data = {
                         'corporate_id': row['corporate_id'],
                         'brand_id'    : row['brand_id'],
                         'date'        : keyword_dict[keyword_list[idx]]['dmc'].keys(),
@@ -201,7 +175,7 @@ if __name__ == '__main__':
 
                 while (True):
                     try:
-                        i_result = bq.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=table_schema)
+                        i_result = bigquery.client.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=bigquery.table_schema)
                         break
                     except NotFound:
                         print('not found table because of delay. please wait...', flush=True)
@@ -210,7 +184,7 @@ if __name__ == '__main__':
                         if (time_out > 50):
                             text = '"{}" BigQuery table not found'.format(client_name)
                             print(text, flush=True)
-                            gmail.send_message(gmail.create_message(text, 'failed'))
+                            #gmail.send_message(gmail.create_message(text, 'failed'))
                             exit()
                         continue
 
@@ -223,4 +197,4 @@ if __name__ == '__main__':
         msg.append(text)
 
     msg ='\n'.join(msg)
-    gmail.send_message(gmail.create_message(msg, status))
+    #gmail.send_message(gmail.create_message(msg, status))
