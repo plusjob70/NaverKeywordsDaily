@@ -81,7 +81,7 @@ if __name__ == '__main__':
                     latest_date_dict[row.device_type] = {}
                 latest_date_dict[row.device_type][row.keyword] = row.latest_date
 
-            keyword_anal.set_latest_date_dict(latest_date_dict)
+            keyword_anal.latest_date_dict = latest_date_dict
 
             df = pd.DataFrame(columns=df_columns)
             for chunk in sheet_data_list:
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         else:
             print('New table found.', flush=True)
             time_out = 0
-            keyword_anal.set_latest_date_dict(latest_date_dict={})
+            keyword_anal.latest_date_dict = {}
 
             for chunk in sheet_data_list:
                 keyword_list = [row.get('keyword', None) for row in chunk]
@@ -175,7 +175,7 @@ if __name__ == '__main__':
 
                 while (True):
                     try:
-                        i_result = bigquery.client.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=bigquery.table_schema)
+                        i_result = bigquery.client.insert_rows_from_dataframe(table=table, dataframe=df, selected_fields=bigquery.table_schema, chunk_size=1000)
                         break
                     except NotFound:
                         print('not found table because of delay. please wait...', flush=True)
