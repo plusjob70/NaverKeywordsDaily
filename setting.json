@@ -5,7 +5,8 @@
     "TOKENPATH" : "",
 
     "PROJECT_NAME" : "",
-    "TABLE_NAME" : "",
+    "BASIC_TABLE_NAME" : "",
+    "GENDER_TABLE_NAME" : "",
 
     "GDRIVE_DIR_NAME" : "",
 
