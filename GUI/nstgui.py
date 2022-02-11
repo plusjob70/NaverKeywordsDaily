@@ -1,4 +1,5 @@
-from cgitb import text
+import os
+import subprocess
 import tkinter as tk
 from naver_trends.service.gsheetsservice import GSheetsService
 from common.constant import *
@@ -6,7 +7,7 @@ from common.constant import *
 class NSTApp():
     def __init__(self):
         self.window = tk.Tk()
-        self.window.iconbitmap('common/resources/enzinex_logo.ico')
+        self.window.iconbitmap(ICON_PATH)
         self.window.title(TITLE)
         self.window.geometry(DEFAULT_WINDOW_SIZE)
         #self.window.resizable(False, False)
@@ -33,12 +34,7 @@ class NSTApp():
             text='성별 추출',
             value='gender'
         )
-        age_radio_btn = tk.Radiobutton(
-            self.window,
-            variable=radio_var,
-            text='연령 추출',
-            value='age'
-        )
+
 
         self.total_listbox = tk.Listbox(
             self.window,
@@ -64,13 +60,12 @@ class NSTApp():
         exe_btn = tk.Button(
             self.window,
             text='Execute',
-            command=self.get_current_selection_items,
+            command=lambda: self.get_current_selection_items(radio_var),
             width=10
         )
 
         basic_radio_btn.pack()
         gender_radio_btn.pack()
-        age_radio_btn.pack()
 
         self.total_listbox.pack()
         refresh_btn.pack()
@@ -87,9 +82,15 @@ class NSTApp():
         for idx, client in enumerate(self.gsheets.get_all_files_info()):
             self.total_listbox.insert(idx, client['name'])
 
-    def get_current_selection_items(self):
+    def get_current_selection_items(self, radio_var):
+        print(radio_var.get())
+        print(f'{os.getcwd()}\\..\\naver_trends\\gender_main.py')
+        
+        command_list = [f'./{os.getcwd()}\\..\\naver_trends\\gender_main.py', radio_var.get()]
         for idx in self.total_listbox.curselection():
             print(self.total_listbox.get(idx))
+            command_list.append(self.total_listbox.get(idx))
+        subprocess.call(command_list)
 
 
 if __name__ == '__main__':
