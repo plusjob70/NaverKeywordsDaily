@@ -1,7 +1,7 @@
 import json
 import urllib.request as UR
 from datetime import date, timedelta, datetime
-from common.constant import *
+from naver_trends.common.constant import *
 
 class Keywordstrend:
     def __init__(self, client_id : str, client_secret : str, keyword_list=None):
@@ -10,17 +10,18 @@ class Keywordstrend:
         self.client_secret = client_secret
         self.keyword_list  = keyword_list
 
-    def generate_body(self, device : str, start_date : date) -> str:
+    def generate_body(self, device : str, gender : str,  start_date : date) -> str:
         keyword_groups = [f"{{\"groupName\":\"{keyword}\",\"keywords\":[\"{keyword}\"]}}" for keyword in self.keyword_list]
         return f"{{\
             \"startDate\":\"{str(start_date)}\",\
             \"endDate\":\"{str(YESTERDAY.date())}\",\
             \"timeUnit\":\"date\",\
-            \"keywordGroups\":{keyword_groups},\
-            \"device\":\"{device}\"\
+            {Q+'device'+Q+ ':' +Q+device+Q+',' if (device is not None) else ''}\
+            {Q+'gender'+Q+ ':' +Q+gender+Q+',' if (gender is not None) else ''}\
+            \"keywordGroups\":{keyword_groups}\
         }}".replace("\'", "").encode('utf-8')
     
-    def request(self, device : str, latest_date_dict : dict):
+    def request(self, device : str=None, gender : str=None, latest_date_dict : dict=None):
         request = UR.Request(self.url)
         request.add_header('X-Naver-Client-Id', self.client_id)
         request.add_header('X-Naver-Client-Secret', self.client_secret)
@@ -39,7 +40,7 @@ class Keywordstrend:
                 oldest_latest_date = DEFAULT_START_DATE
 
             # request
-            response = UR.urlopen(request, data=self.generate_body(device, oldest_latest_date.date()))
+            response = UR.urlopen(request, data=self.generate_body(device=device, gender=gender, start_date=oldest_latest_date.date()))
             res_code = response.getcode()
 
             # initialize ratio_dict(Daily Ratio Dictionary) and mr_dict(Monthly Ratio Dictionary)
