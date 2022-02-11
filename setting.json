@@ -9,6 +9,8 @@
 
     "GDRIVE_DIR_NAME" : "",
 
+    "CHROME_DRIVER_PATH" : "",
+
     "DATALAB_INFO" : [
         {
             "CLIENT_ID" : "",
@@ -17,7 +19,9 @@
     ],
 
     "SEARCHAD_INFO" : [
-        {
+        {   
+            "UID" : "",
+            "UPW" : "",
             "CUSTOMER_ID" : "",
             "SECRET_KEY" : "",
             "ACCESS_LICENCE" : ""
