@@ -22,6 +22,6 @@ else
     pip install --upgrade google-api-python-client
 fi
 
-python main.py
+python basic_main.py
 
 exec $SHELL
