@@ -1,6 +1,6 @@
 import os
 import naver_trends.common.queries as queries
-from naver_trends.common.uinfo import KEYPATH, PROJECT_NAME, TABLE_NAME
+from naver_trends.common.uinfo import KEYPATH, PROJECT_NAME, BASIC_TABLE_NAME
 from google.cloud.bigquery import Client
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.bigquery.table import Table
@@ -20,7 +20,7 @@ class BigQueryService():
     # else create table then get infomation of table
     def get_table_info(self, client_name:str):
         table     = None
-        table_id  = f'{PROJECT_NAME}.{client_name}.{TABLE_NAME}'
+        table_id  = f'{PROJECT_NAME}.{client_name}.{BASIC_TABLE_NAME}'
         try:
             table = self.client.get_table(table_id)
         except NotFound:
@@ -31,7 +31,7 @@ class BigQueryService():
     # return tuple(number of rows, result)
     def get_latest_date_dict(self, client_name:str):
         result = self.client.query(
-            queries.find_latest_date.format(PROJECT_NAME, client_name, TABLE_NAME)
+            queries.find_latest_date.format(PROJECT_NAME, client_name, BASIC_TABLE_NAME)
         ).result()
 
         return (result.total_rows, result)
