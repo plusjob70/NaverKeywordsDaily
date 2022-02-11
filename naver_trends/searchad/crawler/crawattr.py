@@ -1,7 +1,9 @@
-from searchad.crawler.crawler import Crawler
+from naver_trends.searchad.crawler.crawler import Crawler
 
 class GenderCraw(Crawler):
     def extract_relkwd_info(self, keyword_list):
+        self.clear_input_box()
+        
         keyword_str = '\n'.join(keyword_list)
 
         self.insert_to_input_box(keyword_str)
@@ -13,7 +15,7 @@ class GenderCraw(Crawler):
             exist_low_search_tag = self.click_keyword_link(keyword)
 
             if not exist_low_search_tag:
-                pc_ratio, mo_ratio= self.extract_gender_ratio()
+                pc_ratio, mo_ratio = self.extract_gender_ratio()
                 gender_ratio_dict[keyword]['PC'].update(pc_ratio)
                 gender_ratio_dict[keyword]['모바일'].update(mo_ratio)
 

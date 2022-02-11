@@ -1,7 +1,7 @@
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import WebDriverException, NoSuchElementException
+from selenium.common.exceptions import WebDriverException, NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -41,17 +41,17 @@ class Crawler:
             return False
     
     def clear_input_box(self):
-        if type(self.keyword_input_box) is not None:
+        if self.keyword_input_box is not None:
             self.keyword_input_box.clear()
             return
 
     def insert_to_input_box(self, keyword_str):
-        if type(self.keyword_input_box) is not None:
+        if self.keyword_input_box is not None:
             self.keyword_input_box.send_keys(keyword_str)
             return
 
     def click_search_button(self, first_keyword):
-        if type(self.search_button) is not None:
+        if self.search_button is not None:
             self.search_button.click()
             self.timer.until(lambda x: x.find_element(By.XPATH, f"//td[@data-value='{first_keyword}']"))
             return
@@ -74,22 +74,35 @@ class Crawler:
             print("")
 
     def extract_gender_ratio(self):
-        pc_men_element = self.browser.find_element(By.XPATH, "//*[name()='g'][@class='highcharts-series highcharts-series-0 highcharts-column-series highcharts-tracker']/*[name()='rect'][(@x='34.5' and @width='37') or (@x='31.5' and @width='19')]")
-        mo_men_element = self.browser.find_element(By.XPATH, "//*[name()='g'][@class='highcharts-series highcharts-series-1 highcharts-column-series highcharts-tracker']/*[name()='rect'][(@x='80.5' and @width='37') or (@x='47.5' and @width='19')]")
+        try:
+            pc_men_element = self.browser.find_element(By.XPATH, "//*[name()='g'][@class='highcharts-series highcharts-series-0 highcharts-column-series highcharts-tracker']/*[name()='rect'][@x='34.5' and @width='37']")
+            mo_men_element = self.browser.find_element(By.XPATH, "//*[name()='g'][@class='highcharts-series highcharts-series-1 highcharts-column-series highcharts-tracker']/*[name()='rect'][@x='80.5' and @width='37']")
+        except NoSuchElementException:
+            time.sleep(1)
+            pc_men_element = self.browser.find_element(By.XPATH, "//*[name()='g'][@class='highcharts-series highcharts-series-0 highcharts-column-series highcharts-tracker']/*[name()='rect'][(@x='31.5' and @width='19') or (@x='32.5' and @width='19') or (@x='30.5' and @width='6')]")
+            mo_men_element = self.browser.find_element(By.XPATH, "//*[name()='g'][@class='highcharts-series highcharts-series-1 highcharts-column-series highcharts-tracker']/*[name()='rect'][(@x='47.5' and @width='19') or (@x='55.5' and @width='19') or (@x='37.5' and @width='6')]")
 
         # idx 0 : PC / idx 1 : 모바일
         gender_ratio_dict_list = [{'m':0, 'w':0}, {'m':0, 'w':0}]
         
         for idx, element in enumerate([pc_men_element, mo_men_element]):
             ActionChains(self.browser).move_to_element(element).perform()
-            time.sleep(0.5)
 
-            num_click = self.browser.find_element(By.XPATH, "/html/body/div[4]/div/div[1]/div/div/div[2]/div/div[2]/div[1]/div/div/div[2]/div/div/div/span/div/table/tbody/tr/td[2]/strong").text
+            try:
+                num_click = self.browser.find_element(By.XPATH, "/html/body/div[4]/div/div[1]/div/div/div[2]/div/div[2]/div[1]/div/div/div[2]/div/div/div/span/div/table/tbody/tr/td[2]/strong").text
+            except StaleElementReferenceException:
+                num_click = self.browser.find_element(By.XPATH, "/html/body/div[4]/div/div[1]/div/div/div[2]/div/div[2]/div[1]/div/div/div[2]/div/div/div/span/div/table/tbody/tr/td[2]/strong").text
+            except NoSuchElementException:
+                try:
+                    time.sleep(1)
+                    num_click = self.browser.find_element(By.XPATH, "/html/body/div[4]/div/div[1]/div/div/div[2]/div/div[2]/div[1]/div/div/div[2]/div/div/div/span/div/table/tbody/tr/td[2]/strong").text
+                except NoSuchElementException:
+                    continue
 
             if (type(num_click) is str):
-                num_click = float(num_click)
+                num_click = round(float(num_click) * 0.01, 4)
                 gender_ratio_dict_list[idx]['m'] = num_click
-                gender_ratio_dict_list[idx]['w'] = round(100 - num_click, 2)
+                gender_ratio_dict_list[idx]['w'] = round(1 - num_click, 4)
             else:
                 print(f'{element} is not str type', flush=True)
         
