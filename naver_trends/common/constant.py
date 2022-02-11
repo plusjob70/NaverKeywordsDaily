@@ -8,6 +8,11 @@ MO = 1
 ID      = 0
 SECRET  = 1
 LICENSE = 2
+UID     = 3
+UPW     = 4
+
+MEN     = 0
+WOM     = 1
 
 NOW                 = datetime.now()
 IS_DANGEROUS_TIME   = '00:00' <= NOW.strftime('%H:%M') <= '10:00'
