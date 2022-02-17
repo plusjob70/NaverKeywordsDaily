@@ -1,13 +1,14 @@
+#! /usr/bin/env python
 import os
 import subprocess
 import tkinter as tk
 from naver_trends.service.gsheetsservice import GSheetsService
-from common.constant import *
+from GUI.common.constant import *
 
 class NSTApp():
     def __init__(self):
         self.window = tk.Tk()
-        self.window.iconbitmap(ICON_PATH)
+        #self.window.iconbitmap(ICON_PATH)
         self.window.title(TITLE)
         self.window.geometry(DEFAULT_WINDOW_SIZE)
         #self.window.resizable(False, False)
@@ -83,13 +84,19 @@ class NSTApp():
             self.total_listbox.insert(idx, client['name'])
 
     def get_current_selection_items(self, radio_var):
-        print(radio_var.get())
-        print(f'{os.getcwd()}\\..\\naver_trends\\gender_main.py')
+        command_list = []
+        selected_var = radio_var.get()
         
-        command_list = [f'./{os.getcwd()}\\..\\naver_trends\\gender_main.py', radio_var.get()]
+        if selected_var == 'basic':
+            command_list.append(f'{os.getcwd()}/../naver_trends/basic_main.py')
+        elif selected_var == 'gender':
+            command_list.append(f'{os.getcwd()}/../naver_trends/gender_main.py')
+        else:
+            return
+
         for idx in self.total_listbox.curselection():
-            print(self.total_listbox.get(idx))
             command_list.append(self.total_listbox.get(idx))
+
         subprocess.call(command_list)
 
 
