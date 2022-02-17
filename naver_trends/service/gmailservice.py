@@ -1,7 +1,7 @@
 import os.path
 import base64
 from email.mime.text import MIMEText
-from common.uinfo import OAUTHPATH, TOKENPATH
+from naver_trends.common.uinfo import OAUTHPATH, TOKENPATH
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -13,17 +13,24 @@ class GmailService:
         self.scopes   = ['https://www.googleapis.com/auth/gmail.send']
         self.sender   = 'data@enzinex.com'
         self.receiver = 'justin@enzinex.com'
+        self.msgbox   = []
+        self.tag      = 'succeeded'
 
-    def create_message(self, message_text, status):
-        message = MIMEText(message_text)
+    def write_message(self, text):
+        self.msgbox.append(text)
+        return text
+
+    def create_message(self):
+        message = MIMEText('\n'.join(self.msgbox))
         message['from'] = self.sender
         message['to'] = self.receiver
-        message['subject'] = f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} NST Results : ' + status
+        message['subject'] = f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} NST Results : ' + self.tag
         return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
 
-    def send_message(self, message):
-        creds = None
+    def send_message(self):
+        message = self.create_message()
 
+        creds = None
         if os.path.exists(TOKENPATH):
             creds = Credentials.from_authorized_user_file(TOKENPATH, self.scopes)
         if not creds or not creds.valid:
