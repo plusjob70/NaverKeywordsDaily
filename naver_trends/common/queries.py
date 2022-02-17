@@ -1,9 +1,9 @@
 # return : keyword, device_type, latest_date
-find_latest_date = '''
-                    SELECT 
-                        keyword, device_type, max(date) AS latest_date
-                    FROM
-                        {}.{}.{}
-                    GROUP BY
-                        keyword, device_type
+find_latest_date  = '''
+                        SELECT 
+                            keyword, {sep}, max(date) AS latest_date
+                        FROM
+                            {project}.{dataset}.{table}
+                        GROUP BY
+                            keyword, {sep}
                     '''

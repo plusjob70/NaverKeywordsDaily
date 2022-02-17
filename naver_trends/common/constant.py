@@ -2,17 +2,20 @@ from datetime import datetime, timedelta
 
 Q = '\"'
 
-PC = 0
-MO = 1
+MAX_ANAL_BATCH_SIZE   = 5
+MIN_INSERT_BATCH_SIZE = 10000
+BIGQUERY_CHUNK_SIZE   = 1000
+
+PC  = 0
+MO  = 1
+MEN = 0
+WOM = 1
 
 ID      = 0
 SECRET  = 1
 LICENSE = 2
 UID     = 3
 UPW     = 4
-
-MEN     = 0
-WOM     = 1
 
 NOW                 = datetime.now()
 IS_DANGEROUS_TIME   = '00:00' <= NOW.strftime('%H:%M') <= '10:00'
