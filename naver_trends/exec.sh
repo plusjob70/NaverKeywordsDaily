@@ -1,27 +1,28 @@
+#!/usr/bin/zsh
 case "$OSTYPE" in
-  darwin*)  dir="bin" ;; 
-  linux*)   dir="bin" ;;
-  msys*)    dir="Scripts" ;;
-  cygwin*)  dir="Scripts" ;;
-  *)        dir="None" ;;
+  darwin*)    dir="bin" ;; 
+  linux*)     dir="bin" ;;
+  msys*)      dir="Scripts" ;;
+  cygwin*)    dir="Scripts" ;;
+  *)          dir="bin" ;;
 esac
 
-if [ -d "env" ]; then
-    source env/naver_trends_venv/${dir}/activate
-else
-    mkdir env
-    cd env && python -m venv "naver_trends_venv" && cd ..
+cd ..
 
-    source env/naver_trends_venv/${dir}/activate
+if [ -d "venv" ]; then
+    . ./venv/${dir}/activate
+else
+    python3 -m venv "venv" && . ./venv/${dir}/activate
     
-    pip install --upgrade requests
-    pip install --upgrade pandas
-    pip install --upgrade google-cloud-bigquery
-    pip install --upgrade gspread
-    pip install --upgrade oauth2client
-    pip install --upgrade google-api-python-client
+    pip3 install --upgrade requests
+    pip3 install --upgrade pandas
+    pip3 install --upgrade google-cloud-bigquery
+    pip3 install --upgrade gspread
+    pip3 install --upgrade oauth2client
+    pip3 install --upgrade google-api-python-client
+    ./venv/${dir}/bin/python setup.py develop
 fi
 
-python basic_main.py
+cd naver_trends && python3 basic_main.py
 
 exec $SHELL
