@@ -20,6 +20,8 @@ else
     pip3 install --upgrade gspread
     pip3 install --upgrade oauth2client
     pip3 install --upgrade google-api-python-client
+    pip3 install --upgrade selenium
+    
     ./venv/${dir}/bin/python setup.py develop
 fi
 
