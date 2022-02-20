@@ -8,6 +8,9 @@
     "BASIC_TABLE_NAME" : "",
     "GENDER_TABLE_NAME" : "",
 
+    "SENDER_EMAIL" : "",
+    "RECEIVER_EMAIL" : "",
+
     "GDRIVE_DIR_NAME" : "",
 
     "CHROME_DRIVER_PATH" : "",

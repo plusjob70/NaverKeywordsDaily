@@ -1,7 +1,7 @@
 import os.path
 import base64
 from email.mime.text import MIMEText
-from naver_trends.common.uinfo import OAUTHPATH, TOKENPATH
+from naver_trends.common.uinfo import OAUTHPATH, TOKENPATH, SENDER_EMAIL, RECEIVER_EMAIL
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -11,8 +11,8 @@ from datetime import datetime
 class GmailService:
     def __init__(self):
         self.scopes   = ['https://www.googleapis.com/auth/gmail.send']
-        self.sender   = 'data@enzinex.com'
-        self.receiver = 'justin@enzinex.com'
+        self.sender   = SENDER_EMAIL
+        self.receiver = RECEIVER_EMAIL
         self.msgbox   = []
         self.tag      = 'succeeded'
 

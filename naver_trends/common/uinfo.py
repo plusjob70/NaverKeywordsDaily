@@ -13,6 +13,10 @@ PROJECT_NAME       = setting_dict.get('PROJECT_NAME', None)
 BASIC_TABLE_NAME   = setting_dict.get('BASIC_TABLE_NAME', None)
 GENDER_TABLE_NAME  = setting_dict.get("GENDER_TABLE_NAME", None)
 
+# Gmail service
+SENDER_EMAIL       = setting_dict.get('SENDER_EMAIL', None)
+RECEIVER_EMAIL     = setting_dict.get('RECEIVER_EMAIL', None)
+
 # Google Drive directory name
 GDRIVE_DIR_NAME    = setting_dict.get('GDRIVE_DIR_NAME', None)
 
