@@ -129,6 +129,6 @@ for client in client_info_list:
     else:
         print(gmail.write_message(f'{client_name} Done.'), flush=True)
 
-#gmail.send_message()
+gmail.send_message()
             
             

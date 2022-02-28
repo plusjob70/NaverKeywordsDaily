@@ -98,7 +98,7 @@ for client in client_info_list:
                 row['device_type'] = '모바일'
                 dataframe_list.append(pd.DataFrame(columns=dataframe_cols, data=sheet_chunk_list[idx]))
             dataframe_rows = dataframe_rows + pc_data_size + mo_data_size
-        
+
         if dataframe_rows > MIN_INSERT_BATCH_SIZE:
             insert_results = bigquery.client.insert_rows_from_dataframe(
                 table=table,
@@ -129,4 +129,4 @@ for client in client_info_list:
     else:
         print(gmail.write_message(f'{client_name} Done.'), flush=True)
 
-#gmail.send_message()
+gmail.send_message()
