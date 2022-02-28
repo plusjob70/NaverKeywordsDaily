@@ -1,3 +1,5 @@
+import sys
+import numpy as np
 from naver_trends.datalab.keywordstrend import Keywordstrend
 from naver_trends.searchad.relkwdstat import RelKwdStat
 from naver_trends.common.uinfo import *
@@ -39,9 +41,8 @@ class Keywordanal:
                 dpr, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=self.latest_date_dict.get('PC', None))
                 dmr, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=self.latest_date_dict.get('모바일', None))
             except IndexError:
-                print('All users are exhausted', flush=True)
                 print('Cannot analyze : {}'.format(keyword_list))
-                exit()
+                sys.exit('All users are exhausted')
 
         # get relkwdstat
         monthly_click, _ = rks.request()
@@ -50,19 +51,19 @@ class Keywordanal:
         for keyword in keyword_list:
             p_date  = list(dpr[keyword].keys())
             m_date  = list(dmr[keyword].keys())
-            p_ratio = list(dpr[keyword].values())
-            m_ratio = list(dmr[keyword].values())
+            p_ratio = np.array(list(dpr[keyword].values()))
+            m_ratio = np.array(list(dmr[keyword].values()))
 
             mp_constant = 0  # mp_constant = mpc / mpr
             mm_constant = 0  # mm_constant = mmc / mmr
 
-            if mpr[keyword] != 0:
+            if mpr[keyword] != 0: 
                 mp_constant = monthly_click[keyword][PC] / mpr[keyword]
-            if mmr[keyword] != 0:
+            if mmr[keyword] != 0: 
                 mm_constant = monthly_click[keyword][MO] / mmr[keyword]
 
-            p_click = list(map(lambda dpr: int(mp_constant * dpr), p_ratio))
-            m_click = list(map(lambda dmr: int(mm_constant * dmr), m_ratio))
+            p_click = (p_ratio * mp_constant).astype(int)
+            m_click = (m_ratio * mm_constant).astype(int)
 
             keyword_dict[keyword]['dpc'] = dict(zip(p_date, p_click))
             keyword_dict[keyword]['dmc'] = dict(zip(m_date, m_click))
