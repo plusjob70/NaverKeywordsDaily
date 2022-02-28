@@ -43,7 +43,7 @@ class BigQueryService():
             chance = 60
             while (chance > 0):
                 try:
-                    self.client.get_table(table_id)
+                    table = self.client.get_table(table_id)
                     print('table is created')
                     break
                 except NotFound:
