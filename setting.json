@@ -9,7 +9,9 @@
     "GENDER_TABLE_NAME" : "",
 
     "SENDER_EMAIL" : "",
-    "RECEIVER_EMAIL" : "",
+    "RECEIVER_EMAIL" : [
+        
+    ],
 
     "GDRIVE_DIR_NAME" : "",
 

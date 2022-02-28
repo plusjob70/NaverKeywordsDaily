@@ -8,11 +8,8 @@ from GUI.common.constant import *
 class NSTApp():
     def __init__(self):
         self.window = tk.Tk()
-        #self.window.iconbitmap(ICON_PATH)
         self.window.title(TITLE)
         self.window.geometry(DEFAULT_WINDOW_SIZE)
-        #self.window.resizable(False, False)
-
         self.gsheets = GSheetsService()
         self.total_listbox = None
 

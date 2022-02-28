@@ -39,9 +39,8 @@ class Genderanal(Keywordanal):
                 dmr, mmr, men_res_code = kt.request(gender='m', latest_date_dict=self.latest_date_dict.get('남', None))
                 dwr, mwr, wom_res_code = kt.request(gender='f', latest_date_dict=self.latest_date_dict.get('여', None))
             except IndexError:
-                print('All users are exhausted', flush=True)
                 print('Cannot analyze : {}'.format(keyword_list))
-                exit()
+                sys.exit('All users are exhausted')
 
         # get relkwdstat
         monthly_click, _ = rks.request()
@@ -64,8 +63,8 @@ class Genderanal(Keywordanal):
         for keyword in keyword_list:
             m_date  = list(dmr[keyword].keys())
             w_date  = list(dwr[keyword].keys())
-            m_ratio = list(dmr[keyword].values())
-            w_ratio = list(dwr[keyword].values())
+            m_ratio = np.array(list(dmr[keyword].values()))
+            w_ratio = np.array(list(dwr[keyword].values()))
 
             mm_constant = 0  # mm_constant = mmc / mmr
             mw_constant = 0  # mw_constant = mwc / mwr
@@ -75,8 +74,8 @@ class Genderanal(Keywordanal):
             if mwr[keyword] != 0:
                 mw_constant = mgc_dict[keyword][WOM] / mwr[keyword]
 
-            m_click = list(map(lambda dmr: int(mm_constant * dmr), m_ratio))
-            w_click = list(map(lambda dwr: int(mw_constant * dwr), w_ratio))
+            m_click = (m_ratio * mm_constant).astype(int)
+            w_click = (w_ratio * mw_constant).astype(int)
 
             keyword_dict[keyword]['dmc'] = dict(zip(m_date, m_click))
             keyword_dict[keyword]['dwc'] = dict(zip(w_date, w_click))

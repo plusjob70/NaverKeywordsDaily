@@ -37,15 +37,11 @@ schema = {
 }
 
 # create BigQueryService & GSheetsService & GmailService & keyword analize tool & DataFrame instance
-bigquery     = BigQueryService(schema=schema, mode=MODE)
-gsheets      = GSheetsService()
-gmail        = GmailService()
-keyword_anal = Genderanal()
-
-dataframe_list = []
+bigquery       = BigQueryService(schema=schema, mode=MODE)
+gsheets        = GSheetsService()
+gmail          = GmailService()
+keyword_anal   = Genderanal()
 dataframe_cols = schema.keys()
-dataframe_rows = 0
-insert_results = []
 
 print(gmail.write_message(f'mode : {MODE}'), flush=True)
 
@@ -62,6 +58,10 @@ for client in client_info_list:
 
     print(gmail.write_message(f'Analyzing keywords for client : {client_name}'), flush=True)
 
+    dataframe_rows = 0
+    dataframe_list = []
+    insert_results = []
+
     # get sheet file
     sheet      = gsheets.get_sheet(id=client_id)
     sheet_size = len(sheet)
@@ -77,27 +77,27 @@ for client in client_info_list:
     keyword_anal.latest_date_dict = bigquery.get_latest_date_dict(client_name=client_name)
     
     for point in range(0, sheet_size, MAX_ANAL_BATCH_SIZE):
-        sheet_chunck_list = sheet[point:point+MAX_ANAL_BATCH_SIZE]
-        keyword_list = list(map(lambda row: row['keyword'], sheet_chunck_list))
+        sheet_chunk_list = sheet[point:point+MAX_ANAL_BATCH_SIZE]
+        keyword_list = list(map(lambda row: row['keyword'], sheet_chunk_list))
         print(keyword_list, flush=True)
 
         keyword_dict = keyword_anal.get_results(keyword_list=keyword_list)
 
-        for idx, row in enumerate(sheet_chunck_list):
-            pc_data_size = len(keyword_dict[keyword_list[idx]]['dmc'].keys())
-            if pc_data_size > 0:
+        for idx, row in enumerate(sheet_chunk_list):
+            men_data_size = len(keyword_dict[keyword_list[idx]]['dmc'].keys())
+            if men_data_size > 0:
                 row['date']        = keyword_dict[keyword_list[idx]]['dmc'].keys()
                 row['queries']     = keyword_dict[keyword_list[idx]]['dmc'].values()
                 row['gender']      = '남'
-                dataframe_list.append(pd.DataFrame(columns=dataframe_cols, data=sheet_chunck_list[idx]))
+                dataframe_list.append(pd.DataFrame(columns=dataframe_cols, data=sheet_chunk_list[idx]))
 
-            mo_data_size = len(keyword_dict[keyword_list[idx]]['dwc'].keys())
-            if mo_data_size > 0:
+            wom_data_size = len(keyword_dict[keyword_list[idx]]['dwc'].keys())
+            if wom_data_size > 0:
                 row['date']        = keyword_dict[keyword_list[idx]]['dwc'].keys()
                 row['queries']     = keyword_dict[keyword_list[idx]]['dwc'].values()
                 row['gender']      = '여'
-                dataframe_list.append(pd.DataFrame(columns=dataframe_cols, data=sheet_chunck_list[idx]))
-            dataframe_rows = dataframe_rows + pc_data_size + mo_data_size
+                dataframe_list.append(pd.DataFrame(columns=dataframe_cols, data=sheet_chunk_list[idx]))
+            dataframe_rows = dataframe_rows + men_data_size + wom_data_size
         
         if dataframe_rows > MIN_INSERT_BATCH_SIZE:
             insert_results = bigquery.client.insert_rows_from_dataframe(
