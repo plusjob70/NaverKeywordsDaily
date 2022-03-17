@@ -1,8 +1,8 @@
-/naver_trends/env/
 /venv
 *.json
-/data
 __pycache__/
 *.py[cod]
 /test
 *.egg-info/
+*.DS_Store
+.idea/
