@@ -28,6 +28,14 @@ class BigQueryService:
             self.table_name = GENDER_TABLE_NAME
             self.sep = 'gender'
 
+    # check dataset existence
+    def is_exist_dataset(self, client_name: str):
+        try:
+            self.client.get_dataset(client_name)
+            return True
+        except NotFound:
+            return False
+
     # if table exists then get information of table
     # else create table then get information of table
     def get_table_info(self, client_name: str):

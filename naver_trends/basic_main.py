@@ -59,6 +59,10 @@ for client in client_info_list:
 
     print(gmail.write_message(f'Analyzing keywords for client : {client_name}'), flush=True)
 
+    if not bigquery.is_exist_dataset(client_name=client_name):
+        print(gmail.write_message(f'\"{client_name}\" dataset is not exist'), flush=True)
+        continue
+
     dataframe_rows = 0
     dataframe_list = []
     insert_results = []
