@@ -94,7 +94,10 @@ class NSTApp:
         for idx in self.total_listbox.curselection():
             command_list.append(self.total_listbox.get(idx))
 
-        subprocess.call(command_list)
+        if not command_list:
+            return
+        else:
+            subprocess.call(command_list)
 
 
 if __name__ == '__main__':
