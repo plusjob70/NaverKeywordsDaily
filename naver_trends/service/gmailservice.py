@@ -8,13 +8,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from datetime import datetime
 
+
 class GmailService:
     def __init__(self):
-        self.scopes   = ['https://www.googleapis.com/auth/gmail.send']
-        self.sender   = SENDER_EMAIL
+        self.scopes = ['https://www.googleapis.com/auth/gmail.send']
+        self.sender = SENDER_EMAIL
         self.receiver = ', '.join(RECEIVER_EMAIL_LIST)
-        self.msgbox   = []
-        self.tag      = 'succeeded'
+        self.msgbox = []
+        self.tag = 'succeeded'
 
     def write_message(self, text):
         self.msgbox.append(text)
@@ -41,7 +42,7 @@ class GmailService:
                 creds = flow.run_local_server(port=0)
             with open(TOKENPATH, 'w') as token:
                 token.write(creds.to_json())
-                
+
         try:
             gmail = build('gmail', 'v1', credentials=creds)
             results = gmail.users().messages().send(userId='me', body=message).execute()

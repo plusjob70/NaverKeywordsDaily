@@ -1,11 +1,12 @@
-#! /usr/bin/env python
+#! /usr/bin/python
 import os
 import subprocess
 import tkinter as tk
 from naver_trends.service.gsheetsservice import GSheetsService
 from GUI.common.constant import *
 
-class NSTApp():
+
+class NSTApp:
     def __init__(self):
         self.window = tk.Tk()
         self.window.title(TITLE)
@@ -15,7 +16,7 @@ class NSTApp():
 
     def run(self):
         # elements in listboxes
-        client_list     = [client['name'] for client in self.gsheets.get_all_files_info()]
+        client_list = [client['name'] for client in self.gsheets.get_all_files_info()]
         client_list_var = tk.StringVar(value=client_list)
 
         radio_var = tk.StringVar(None, 'basic')
@@ -32,7 +33,6 @@ class NSTApp():
             text='성별 추출',
             value='gender'
         )
-
 
         self.total_listbox = tk.Listbox(
             self.window,
@@ -71,10 +71,10 @@ class NSTApp():
         exe_btn.pack()
 
         self.window.mainloop()
-    
+
     def select_all(self):
         self.total_listbox.select_set(0, self.total_listbox.size())
-        
+
     def refresh_total_listbox(self):
         self.total_listbox.delete(0, self.total_listbox.size())
         for idx, client in enumerate(self.gsheets.get_all_files_info()):
@@ -83,7 +83,7 @@ class NSTApp():
     def get_current_selection_items(self, radio_var):
         command_list = []
         selected_var = radio_var.get()
-        
+
         if selected_var == 'basic':
             command_list.append(f'{os.getcwd()}/../naver_trends/basic_main.py')
         elif selected_var == 'gender':
@@ -94,7 +94,11 @@ class NSTApp():
         for idx in self.total_listbox.curselection():
             command_list.append(self.total_listbox.get(idx))
 
-        subprocess.call(command_list)
+        if len(command_list) < 2:
+            print('Select at least one')
+            return
+        else:
+            subprocess.call(command_list)
 
 
 if __name__ == '__main__':
