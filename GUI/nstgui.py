@@ -94,7 +94,8 @@ class NSTApp:
         for idx in self.total_listbox.curselection():
             command_list.append(self.total_listbox.get(idx))
 
-        if not command_list:
+        if len(command_list) < 2:
+            print('Select at least one')
             return
         else:
             subprocess.call(command_list)

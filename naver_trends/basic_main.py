@@ -10,11 +10,11 @@ def main():
     from naver_trends.service.gsheetsservice import GSheetsService
     from naver_trends.service.gmailservice import GmailService
 
-    MODE = 'basic'
-
     # check dangerous time
     if IS_DANGEROUS_TIME:
         sys.exit('Deny access to the server. It is a dangerous time.')
+
+    MODE = 'basic'
 
     # extract selected_client_list
     selected_client_name_list = sys.argv[1:]
@@ -48,7 +48,6 @@ def main():
     # client_info_list = list[dict{id, name}, dict{id, name}, ...]
     client_info_list = gsheets.get_all_files_info()
 
-    return
     print('Start to analyze keywords...', flush=True)
     for client in client_info_list:
         client_id = client['id']
@@ -78,7 +77,7 @@ def main():
         # get table information
         table = bigquery.get_table_info(client_name=client_name)
 
-        # set latest date
+        # set the latest date
         keyword_anal.latest_date_dict = bigquery.get_latest_date_dict(client_name=client_name)
 
         for point in range(0, sheet_size, MAX_ANAL_BATCH_SIZE):
