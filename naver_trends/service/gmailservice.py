@@ -21,7 +21,7 @@ class GmailService:
         self.msgbox.append(text)
         return text
 
-    def create_message(self):
+    def __create_message(self):
         message = MIMEText('\n'.join(self.msgbox))
         message['from'] = self.sender
         message['to'] = self.receiver
@@ -29,7 +29,7 @@ class GmailService:
         return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
 
     def send_message(self):
-        message = self.create_message()
+        message = self.__create_message()
 
         creds = None
         if os.path.exists(TOKENPATH):
