@@ -12,17 +12,17 @@ class Keywordanal:
         self.customer_idx = 0
         self.latest_date_dict = {}
 
+    """
+    dpc : Daily   PC     Click
+    dpr : Daily   PC     Ratio
+    mpc : Monthly PC     Click
+    mpr : Monthly PC     Ratio
+    dmc : Daily   Mobile Click
+    dmr : Daily   Mobile Ratio
+    mmc : Monthly Mobile Click
+    mmr : Monthly Mobile Ratio
+    """
     def get_results(self, keyword_list) -> dict:
-        """
-            dpc : Daily   PC     Click
-            dpr : Daily   PC     Ratio
-            mpc : Monthly PC     Click
-            mpr : Monthly PC     Ratio
-            dmc : Daily   Mobile Click
-            dmr : Daily   Mobile Ratio
-            mmc : Monthly Mobile Click
-            mmr : Monthly Mobile Ratio
-        """
         # initial keyword dictionary
         keyword_dict = {keyword: {'dpc': dict, 'dmc': dict} for keyword in keyword_list}
 
@@ -34,16 +34,24 @@ class Keywordanal:
                          CUSTOMER_LIST[self.customer_idx][SECRET], keyword_list)
 
         # get keywords trend
-        dpr, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=self.latest_date_dict.get('PC', None))
-        dmr, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=self.latest_date_dict.get('모바일', None))
+        dpr, mpr, pc_res_code = kt.request(device='pc',
+                                           latest_date_dict=self.latest_date_dict.get('PC', {}))
+        dmr, mmr, mo_res_code = kt.request(device='mo',
+                                           latest_date_dict=self.latest_date_dict.get('모바일', {}))
 
         while pc_res_code == 429 | mo_res_code == 429:
             try:
                 print("This user has exceeded the limit of the number of requests. Requesting new user...", flush=True)
                 self.client_idx += 1
-                kt = Keywordstrend(CLIENT_LIST[self.client_idx][ID], CLIENT_LIST[self.client_idx][SECRET], keyword_list)
-                dpr, mpr, pc_res_code = kt.request(device='pc', latest_date_dict=self.latest_date_dict.get('PC', None))
-                dmr, mmr, mo_res_code = kt.request(device='mo', latest_date_dict=self.latest_date_dict.get('모바일', None))
+
+                kt = Keywordstrend(CLIENT_LIST[self.client_idx][ID],
+                                   CLIENT_LIST[self.client_idx][SECRET],
+                                   keyword_list)
+
+                dpr, mpr, pc_res_code = kt.request(device='pc',
+                                                   latest_date_dict=self.latest_date_dict.get('PC', {}))
+                dmr, mmr, mo_res_code = kt.request(device='mo',
+                                                   latest_date_dict=self.latest_date_dict.get('모바일', {}))
             except IndexError:
                 print('Cannot analyze : {}'.format(keyword_list))
                 sys.exit('All users are exhausted')
@@ -58,13 +66,10 @@ class Keywordanal:
             p_ratio = np.array(list(dpr[keyword].values()))
             m_ratio = np.array(list(dmr[keyword].values()))
 
-            mp_constant = 0  # mp_constant = mpc / mpr
-            mm_constant = 0  # mm_constant = mmc / mmr
-
-            if mpr[keyword] != 0:
-                mp_constant = monthly_click[keyword][PC] / mpr[keyword]
-            if mmr[keyword] != 0:
-                mm_constant = monthly_click[keyword][MO] / mmr[keyword]
+            # mp_constant = mpc / mpr
+            # mm_constant = mmc / mmr
+            mp_constant = (monthly_click[keyword][PC] / mpr[keyword]) if mpr[keyword] else 0
+            mm_constant = (monthly_click[keyword][MO] / mmr[keyword]) if mmr[keyword] else 0
 
             p_click = (p_ratio * mp_constant).astype(int)
             m_click = (m_ratio * mm_constant).astype(int)
