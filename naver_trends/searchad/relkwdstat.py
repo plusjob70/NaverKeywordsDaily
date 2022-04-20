@@ -51,12 +51,15 @@ class RelKwdStat:
                     mpc: Union[int, str] = result.get('monthlyPcQcCnt')
                     mmc: Union[int, str] = result.get('monthlyMobileQcCnt')
 
-                    if (type(mpc) is int) and (type(mmc) is int):
+                    if type(mpc) is int:
                         click_count_dict[rel_keyword][0] = mpc
+                    else:
+                        print(f'pc_click_count = \'{rel_keyword}\': ({mpc}) -> 0')
+
+                    if type(mmc) is int:
                         click_count_dict[rel_keyword][1] = mmc
                     else:
-                        print(f'pc_click_count = \'{rel_keyword}\': ({mpc}) -> 0\n'
-                              f'mo_click_count = \'{rel_keyword}\': ({mmc}) -> 0')
+                        print(f'mo_click_count = \'{rel_keyword}\': ({mmc}) -> 0')
                 else:
                     break
             print(f'{click_count_dict = }')
