@@ -19,7 +19,7 @@ class BigQueryService:
         self.sep = None
 
         if schema is not None:
-            self.table_schema = [SchemaField(col, type) for col, type in schema.items()]
+            self.table_schema = [SchemaField(_col, _type) for _col, _type in schema.items()]
 
         if self.mode == 'basic':
             self.table_name = BASIC_TABLE_NAME

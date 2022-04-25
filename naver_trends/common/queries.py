@@ -6,4 +6,4 @@ find_latest_date = '''
                             {project}.{dataset}.{table}
                         GROUP BY
                             keyword, {sep}
-                  '''
+                   '''

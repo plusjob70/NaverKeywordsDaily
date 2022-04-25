@@ -78,7 +78,7 @@ for client in client_info_list:
     # get table information
     table = bigquery.get_table_info(client_name=client_name)
 
-    # set latest date
+    # set the latest date
     keyword_anal.latest_date_dict = bigquery.get_latest_date_dict(client_name=client_name)
 
     for point in range(0, sheet_size, MAX_ANAL_BATCH_SIZE):
@@ -113,7 +113,7 @@ for client in client_info_list:
             )
             dataframe_rows = 0
             dataframe_list = []
-            if sum(map(lambda x: len(x), insert_results)):
+            if any(insert_results):
                 print(insert_results)
                 print(gmail.write_message(f"insertion failed : {keyword_list}"), flush=True)
                 gmail.tag = 'failed'
@@ -128,7 +128,7 @@ for client in client_info_list:
         dataframe_rows = 0
         dataframe_list = []
 
-    if sum(map(lambda x: len(x), insert_results)):
+    if any(insert_results):
         print(gmail.write_message(f'{client_name} failed.'), flush=True)
         gmail.tag = 'failed'
     else:

@@ -25,7 +25,7 @@ class GmailService:
         message = MIMEText('\n'.join(self.msgbox))
         message['from'] = self.sender
         message['to'] = self.receiver
-        message['subject'] = f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} NST Results : ' + self.tag
+        message['subject'] = f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} NST Results : {self.tag}'
         return {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode()}
 
     def send_message(self):

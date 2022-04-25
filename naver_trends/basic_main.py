@@ -112,7 +112,8 @@ def main():
                 )
                 dataframe_rows = 0
                 dataframe_list = []
-                if sum(map(lambda x: len(x), insert_results)):
+
+                if any(insert_results):
                     print(insert_results)
                     print(gmail.write_message("----insertion failed----"), flush=True)
                     gmail.tag = 'failed'
@@ -127,7 +128,8 @@ def main():
                 chunk_size=BIGQUERY_CHUNK_SIZE
             )
 
-        if sum(map(lambda x: len(x), insert_results)):
+        if any(insert_results):
+            print(insert_results)
             print(gmail.write_message(f'{client_name} failed.'), flush=True)
             gmail.tag = 'failed'
         else:
