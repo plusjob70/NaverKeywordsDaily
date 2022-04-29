@@ -12,7 +12,23 @@ class Keywordstrend:
         self.client_secret = _client_secret
         self.keyword_list = _keyword_list
 
-    def __generate_body(self, device: str, gender: str, start_date: date) -> bytes:
+    """
+    device = 'pc' or 'mo'
+    gender = 'm' or 'f'
+    ages = [1 ~ 11]
+        1 : 0~12세
+        2 : 13~18세
+        3 : 19~24세
+        4 : 25~29세
+        5 : 30~34세
+        6 : 35~39세
+        7 : 40~44세
+        8 : 45~49세
+        9 : 50~54세
+        10 : 55~59세
+        11 : 60세~
+    """
+    def __generate_body(self, device: str, gender: str, ages: list[int], start_date: date) -> bytes:
         keyword_groups = [f"{{\"groupName\":\"{keyword}\",\"keywords\":[\"{keyword}\"]}}"
                           for keyword in self.keyword_list]
         return f"{{\
@@ -21,11 +37,11 @@ class Keywordstrend:
             \"timeUnit\":\"date\",\
             {Q + 'device' + Q + ':' + Q + device + Q + ',' if (device is not None) else ''}\
             {Q + 'gender' + Q + ':' + Q + gender + Q + ',' if (gender is not None) else ''}\
+            {Q + 'ages' + Q + ':' + str([f'{Q+ str(age) +Q}' for age in ages]) + ',' if (ages is not None) else ''}\
             \"keywordGroups\":{keyword_groups}\
         }}".replace("\'", "").encode('utf-8')
 
-    def request(self, device: str = None, gender: str = None, latest_date_dict: dict = None):
-
+    def request(self, _device: str = None, _gender: str = None, _ages: list = None, latest_date_dict: dict = None):
         if latest_date_dict is None:
             latest_date_dict = {}
 
@@ -45,8 +61,9 @@ class Keywordstrend:
                 oldest_latest_date = DEFAULT_START_DATE
 
             # request
-            response = urlreq.urlopen(request, data=self.__generate_body(device=device,
-                                                                         gender=gender,
+            response = urlreq.urlopen(request, data=self.__generate_body(device=_device,
+                                                                         gender=_gender,
+                                                                         ages=_ages,
                                                                          start_date=oldest_latest_date.date()))
             res_code = response.getcode()
 
@@ -77,7 +94,7 @@ class Keywordstrend:
 
                 mr_dict[keyword] = sum(list(ratio_dict.values())[-30:])
                 dr_dict[keyword] = dict(filter(lambda x: x[0] > latest_date, ratio_dict.items()))
-            print(f'{device if device is not None else gender} : {mr_dict = }')
+            print(f'{_device}, {_gender}, {_ages} : {mr_dict = }')
             return dr_dict, mr_dict, res_code
 
         except HTTPError as error:

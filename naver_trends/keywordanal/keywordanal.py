@@ -34,9 +34,9 @@ class Keywordanal:
                          CUSTOMER_LIST[self.customer_idx][SECRET], keyword_list)
 
         # get keywords trend
-        dpr, mpr, pc_res_code = kt.request(device='pc',
+        dpr, mpr, pc_res_code = kt.request(_device='pc',
                                            latest_date_dict=self.latest_date_dict.get('PC', {}))
-        dmr, mmr, mo_res_code = kt.request(device='mo',
+        dmr, mmr, mo_res_code = kt.request(_device='mo',
                                            latest_date_dict=self.latest_date_dict.get('모바일', {}))
 
         while pc_res_code == 429 | mo_res_code == 429:
@@ -48,9 +48,9 @@ class Keywordanal:
                                    CLIENT_LIST[self.client_idx][SECRET],
                                    keyword_list)
 
-                dpr, mpr, pc_res_code = kt.request(device='pc',
+                dpr, mpr, pc_res_code = kt.request(_device='pc',
                                                    latest_date_dict=self.latest_date_dict.get('PC', {}))
-                dmr, mmr, mo_res_code = kt.request(device='mo',
+                dmr, mmr, mo_res_code = kt.request(_device='mo',
                                                    latest_date_dict=self.latest_date_dict.get('모바일', {}))
             except IndexError:
                 print('Cannot analyze : {}'.format(keyword_list))

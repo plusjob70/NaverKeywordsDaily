@@ -36,9 +36,9 @@ class Genderanal(Keywordanal):
                          CUSTOMER_LIST[self.customer_idx][SECRET], keyword_list)
 
         # get keywords trend
-        dmr, mmr, men_res_code = kt.request(gender='m',
+        dmr, mmr, men_res_code = kt.request(_gender='m',
                                             latest_date_dict=self.latest_date_dict.get('남', {}))
-        dwr, mwr, wom_res_code = kt.request(gender='f',
+        dwr, mwr, wom_res_code = kt.request(_gender='f',
                                             latest_date_dict=self.latest_date_dict.get('여', {}))
 
         while men_res_code == 429 | wom_res_code == 429:
@@ -50,9 +50,9 @@ class Genderanal(Keywordanal):
                                    CLIENT_LIST[self.client_idx][SECRET],
                                    keyword_list)
 
-                dmr, mmr, men_res_code = kt.request(gender='m',
+                dmr, mmr, men_res_code = kt.request(_gender='m',
                                                     latest_date_dict=self.latest_date_dict.get('남', {}))
-                dwr, mwr, wom_res_code = kt.request(gender='f',
+                dwr, mwr, wom_res_code = kt.request(_gender='f',
                                                     latest_date_dict=self.latest_date_dict.get('여', {}))
             except IndexError:
                 print('Cannot analyze : {}'.format(keyword_list))
