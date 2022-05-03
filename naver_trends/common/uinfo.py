@@ -20,9 +20,6 @@ RECEIVER_EMAIL_LIST = [email for email in setting_dict.get('RECEIVER_EMAIL', Non
 # Google Drive directory name
 GDRIVE_DIR_NAME = setting_dict.get('GDRIVE_DIR_NAME', None)
 
-# Chrome driver path
-CHROME_DRIVER_PATH = setting_dict.get('CHROME_DRIVER_PATH', None)
-
 # datalab user info(네이버 데이터랩 API 사용자 정보)
 CLIENT_LIST = [(client['CLIENT_ID'], client['CLIENT_SECRET']) for client in setting_dict.get('DATALAB_INFO', None)]
 
@@ -42,6 +39,5 @@ assert GENDER_TABLE_NAME, 'Insert GENDER_TABLE_NAME in setting.json file'
 assert SENDER_EMAIL, 'Insert SENDER_EMAIL in setting.json file'
 assert RECEIVER_EMAIL_LIST, 'Insert RECEIVER_EMAIL_LIST in setting.json file'
 assert GDRIVE_DIR_NAME, 'Insert GDRIVE_DIR_NAME in setting.json file'
-assert CHROME_DRIVER_PATH, 'Insert CHROME_DRIVER_PATH in setting.json file'
 assert CLIENT_LIST, 'Insert CLIENT_LIST in setting.json file'
 assert CUSTOMER_LIST, 'Insert CUSTOMER_LIST in setting.json file'
