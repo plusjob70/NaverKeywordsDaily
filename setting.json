@@ -10,12 +10,10 @@
 
     "SENDER_EMAIL" : "",
     "RECEIVER_EMAIL" : [
-        
+        ""
     ],
 
     "GDRIVE_DIR_NAME" : "",
-
-    "CHROME_DRIVER_PATH" : "",
 
     "DATALAB_INFO" : [
         {
@@ -25,7 +23,7 @@
     ],
 
     "SEARCHAD_INFO" : [
-        {   
+        {
             "UID" : "",
             "UPW" : "",
             "CUSTOMER_ID" : "",

@@ -5,7 +5,7 @@ def main():
     import pandas as pd
     from naver_trends.common.constant \
         import IS_DANGEROUS_TIME, MAX_ANAL_BATCH_SIZE, MIN_INSERT_BATCH_SIZE, BIGQUERY_CHUNK_SIZE
-    from naver_trends.keywordanal.keywordanal import Keywordanal
+    from naver_trends.keywordanal.device_analyzer import DeviceAnalyzer
     from naver_trends.service.bigqueryservice import BigQueryService
     from naver_trends.service.gsheetsservice import GSheetsService
     from naver_trends.service.gmailservice import GmailService
@@ -39,7 +39,7 @@ def main():
     bigquery = BigQueryService(schema=schema, mode=MODE)
     gsheets = GSheetsService()
     gmail = GmailService()
-    keyword_anal = Keywordanal()
+    analyzer = DeviceAnalyzer()
     dataframe_cols = schema.keys()
 
     print(gmail.write_message(f'mode : {MODE}'), flush=True)
@@ -78,14 +78,14 @@ def main():
         table = bigquery.get_table_info(client_name=client_name)
 
         # set the latest date
-        keyword_anal.latest_date_dict = bigquery.get_latest_date_dict(client_name=client_name)
+        analyzer.set_latest_date_dict(bigquery.get_latest_date_dict(client_name=client_name))
 
         for point in range(0, sheet_size, MAX_ANAL_BATCH_SIZE):
             sheet_chunk_list = sheet[point:point + MAX_ANAL_BATCH_SIZE]
             keyword_list = list(map(lambda chunk: chunk['keyword'], sheet_chunk_list))
             print(keyword_list, flush=True)
 
-            keyword_dict = keyword_anal.get_results(keyword_list=keyword_list)
+            keyword_dict = analyzer.get_results(keyword_list=keyword_list)
 
             for idx, row in enumerate(sheet_chunk_list):
                 pc_data_size = len(keyword_dict[keyword_list[idx]]['dpc'])
@@ -112,7 +112,8 @@ def main():
                 )
                 dataframe_rows = 0
                 dataframe_list = []
-                if sum(map(lambda x: len(x), insert_results)):
+
+                if any(insert_results):
                     print(insert_results)
                     print(gmail.write_message("----insertion failed----"), flush=True)
                     gmail.tag = 'failed'
@@ -127,7 +128,8 @@ def main():
                 chunk_size=BIGQUERY_CHUNK_SIZE
             )
 
-        if sum(map(lambda x: len(x), insert_results)):
+        if any(insert_results):
+            print(insert_results)
             print(gmail.write_message(f'{client_name} failed.'), flush=True)
             gmail.tag = 'failed'
         else:
