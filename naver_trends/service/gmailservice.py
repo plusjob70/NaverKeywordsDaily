@@ -49,8 +49,10 @@ class GmailService:
             label = results.get('labelIds', [])
 
             if label == ['SENT']:
+                print('mail has been sent successfully.')
                 return True
             else:
+                print('failed to send mail.')
                 return False
         except Exception as e:
             print(f'message send failed, error: {e}')

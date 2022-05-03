@@ -1,5 +1,4 @@
 import requests
-import json
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -39,18 +38,18 @@ class JWTStorage:
             }
 
     def set_init_tokens(self):
-        payload = json.dumps({
+        payload = {
             'loginId': f'{self.__login_id}',
             'loginPwd': f'{self.__login_pwd}'
-        }, separators=(',', ':'))
+        }
 
-        with requests.post(url=self.login_url, headers=self.headers, data=payload) as response:
+        with requests.post(url=self.login_url, headers=self.headers, json=payload) as response:
             if (res_code := response.status_code) != 200:
                 print(response.text, flush=True)
                 self.__jwt = JWT(access_token=str(res_code), refresh_token='', request_time=datetime.now())
                 return self
 
-            tokens = json.loads(response.text)
+            tokens = response.json()
             self.__jwt = JWT(access_token=tokens['token'], refresh_token=tokens['refreshToken'], request_time=datetime.now())
             return self
 
@@ -63,7 +62,7 @@ class JWTStorage:
                 self.__jwt = JWT(access_token=str(res_code), refresh_token='', request_time=datetime.now())
                 return self
 
-            tokens = json.loads(response.text)
+            tokens = response.json()
             self.__jwt = JWT(access_token=tokens['token'], refresh_token=tokens['refreshToken'], request_time=datetime.now())
             return self
 

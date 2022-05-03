@@ -1,20 +1,12 @@
-import json
+import time
 import requests
 import pandas as pd
-from naver_trends.common.constant import UID, UPW
-from naver_trends.common.uinfo import CUSTOMER_LIST
 from naver_trends.searchad.relkwdstat_detail.jwt import JWTStorage
 
 
 class RelkwdstatDetail:
-    @classmethod
-    def customer_info(cls):
-        if CUSTOMER_LIST:
-            return CUSTOMER_LIST[0][UID], CUSTOMER_LIST[0][UPW]
-        return '', ''
-
-    def __init__(self):
-        self.token_storage = JWTStorage(*self.__class__.customer_info()).set_init_tokens()
+    def __init__(self, customer_id, customer_pwd):
+        self.token_storage = JWTStorage(customer_id, customer_pwd).set_init_tokens()
         self.url = 'https://manage.searchad.naver.com/keywordstool'
         self.headers = {
             'authorization': f'Bearer {self.token_storage.get_access_token()}',
@@ -31,31 +23,47 @@ class RelkwdstatDetail:
         print('access token is changed')
 
     # get monthly click count about detail attribute (age, gender, device)
-    def get_detail_data(self, keyword: str, scopes: list = None):
-        self.params['keyword'] = keyword
-        df = pd.DataFrame(columns=['age', 'gender', 'device', 'count'])
-
+    def request(self, _keyword_list, scopes: list = None):
         if scopes is None:
-            scopes = ['age', 'gender', 'device']
+            scopes = ['age', 'device', 'gender']
+        else:
+            scopes.sort()
 
-        with requests.get(url=self.url, headers=self.headers, params=self.params) as response:
-            if (res_code := response.status_code) == 401:
-                self.__change_access_token()
-                response = requests.get(url=self.url, headers=self.headers, params=self.params)
-            elif res_code != 200:
-                print(response.text)
-                return df
+        click_count_dict = {keyword: None for keyword in _keyword_list}
 
-            data = json.loads(response.text)['keywordList'][0]['userStat']
+        for keyword in _keyword_list:
+            self.params['keyword'] = keyword
+            df = pd.DataFrame(columns=['age', 'device', 'gender', f'{keyword}'])
 
-            if not ((age_group_list := data['ageGroup']) and (gender_type_list := data['genderType'])):
-                return df
+            with requests.get(url=self.url, headers=self.headers, params=self.params) as response:
+                if (res_code := response.status_code) == 200:
+                    pass
+                elif res_code == 401:
+                    self.__change_access_token()
+                    response = requests.get(url=self.url, headers=self.headers, params=self.params)
+                elif res_code == 429:
+                    print('too fast request. wait 3 seconds...')
+                    time.sleep(3)
+                    response = requests.get(url=self.url, headers=self.headers, params=self.params)
+                else:
+                    print(response.text)
+                    continue
 
-            monthly_pc_cnt_list = data['monthlyPcQcCnt']
-            monthly_mo_cnt_list = data['monthlyMobileQcCnt']
+                data = response.json()['keywordList'][0]['userStat']
+                if not ((age_group_list := data['ageGroup']) and (gender_type_list := data['genderType'])):
+                    continue
 
-            df['age'] = age_group_list * 2
-            df['gender'] = gender_type_list * 2
-            df['device'] = ['PC'] * len(monthly_pc_cnt_list) + ['모바일'] * len(monthly_mo_cnt_list)
-            df['count'] = monthly_pc_cnt_list + monthly_mo_cnt_list
-        return df.groupby(scopes).sum()
+                monthly_pc_cnt_list = data['monthlyPcQcCnt']
+                monthly_mo_cnt_list = data['monthlyMobileQcCnt']
+
+                df['age'] = age_group_list * 2
+                df['device'] = ['PC'] * len(monthly_pc_cnt_list) + ['모바일'] * len(monthly_mo_cnt_list)
+                df['gender'] = gender_type_list * 2
+                df[f'{keyword}'] = monthly_pc_cnt_list + monthly_mo_cnt_list
+
+                df = df.groupby(scopes).sum()
+
+                if not df.empty:
+                    click_count_dict.update(df.to_dict())
+
+        return click_count_dict
