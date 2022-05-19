@@ -19,19 +19,25 @@ class NSTApp:
         client_list = [client['name'] for client in self.gsheets.get_all_files_info()]
         client_list_var = tk.StringVar(value=client_list)
 
-        radio_var = tk.StringVar(None, 'basic')
+        radio_var = tk.StringVar(None, 'device')
 
         basic_radio_btn = tk.Radiobutton(
             self.window,
             variable=radio_var,
-            text='기본 추출',
-            value='basic'
+            text='디바이스 추출',
+            value='device'
         )
         gender_radio_btn = tk.Radiobutton(
             self.window,
             variable=radio_var,
             text='성별 추출',
             value='gender'
+        )
+        age_radio_btn = tk.Radiobutton(
+            self.window,
+            variable=radio_var,
+            text='나이 추출',
+            value='age'
         )
 
         self.total_listbox = tk.Listbox(
@@ -45,25 +51,26 @@ class NSTApp:
 
         refresh_btn = tk.Button(
             self.window,
-            text='Refresh',
+            text='새로고침',
             command=self.refresh_total_listbox,
             width=10
         )
         select_all_btn = tk.Button(
             self.window,
-            text='Select all',
+            text='전체선택',
             command=self.select_all,
             width=10
         )
         exe_btn = tk.Button(
             self.window,
-            text='Execute',
+            text='실행하기',
             command=lambda: self.get_current_selection_items(radio_var),
             width=10
         )
 
         basic_radio_btn.pack()
         gender_radio_btn.pack()
+        age_radio_btn.pack()
 
         self.total_listbox.pack()
         refresh_btn.pack()
@@ -81,20 +88,14 @@ class NSTApp:
             self.total_listbox.insert(idx, client['name'])
 
     def get_current_selection_items(self, radio_var):
-        command_list = []
-        selected_var = radio_var.get()
 
-        if selected_var == 'basic':
-            command_list.append(f'{os.getcwd()}/../naver_trends/basic_main.py')
-        elif selected_var == 'gender':
-            command_list.append(f'{os.getcwd()}/../naver_trends/gender_main.py')
-        else:
-            return
+        selected_var = radio_var.get()
+        command_list = [f'{os.getcwd()}/../naver_trends/main.py', selected_var]
 
         for idx in self.total_listbox.curselection():
             command_list.append(self.total_listbox.get(idx))
 
-        if len(command_list) < 2:
+        if len(command_list) <= 2:
             print('Select at least one')
             return
         else:
