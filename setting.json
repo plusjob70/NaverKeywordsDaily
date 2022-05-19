@@ -5,8 +5,9 @@
     "TOKENPATH" : "",
 
     "PROJECT_NAME" : "",
-    "BASIC_TABLE_NAME" : "",
+    "DEVICE_TABLE_NAME" : "",
     "GENDER_TABLE_NAME" : "",
+    "AGE_TABLE_NAME" : "",
 
     "SENDER_EMAIL" : "",
     "RECEIVER_EMAIL" : [
