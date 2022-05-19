@@ -37,7 +37,7 @@ class GenderAnalyzer(KeywordAnalyzer):
                 dfr, mfr, fem_res_code = keywords_trend.request(_keyword_list=keyword_list,
                                                                 _gender='f',
                                                                 latest_date_dict=self.get_latest_date_dict().get('여', {}))
-                if not self.exceed_daily_request(mal_res_code, fem_res_code):
+                if not self.exceed_request_limit(mal_res_code, fem_res_code):
                     break
             except IndexError:
                 print('Cannot analyze : {}'.format(keyword_list))

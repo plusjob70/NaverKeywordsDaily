@@ -39,7 +39,7 @@ class DeviceAnalyzer(KeywordAnalyzer):
                 dmr, mmr, mo_res_code = keywords_trend.request(_keyword_list=keyword_list,
                                                                _device='mo',
                                                                latest_date_dict=self.get_latest_date_dict().get('모바일', {}))
-                if not self.exceed_daily_request(pc_res_code, mo_res_code):
+                if not self.exceed_request_limit(pc_res_code, mo_res_code):
                     break
             except IndexError:
                 print('Cannot analyze : {}'.format(keyword_list))

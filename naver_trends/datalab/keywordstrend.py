@@ -1,4 +1,5 @@
 import requests
+from itertools import dropwhile
 from datetime import date, timedelta, datetime
 from naver_trends.common.constant import *
 
@@ -78,7 +79,7 @@ class Keywordstrend:
 
                 # initialize zero_dict for mr_dict
                 if (oldest_latest_date + timedelta(days=30)) > YESTERDAY:
-                    zero_dict = {str(YESTERDAY.date() - timedelta(day)): 0 for day in range(30)}
+                    zero_dict = {str(YESTERDAY.date() - timedelta(day)): 0 for day in range(29, -1, -1)}
                 else:
                     day_diff: int = (NOW - oldest_latest_date).days
                     zero_dict = {str(oldest_latest_date.date() + timedelta(days=day)): 0 for day in range(day_diff)}
@@ -94,7 +95,7 @@ class Keywordstrend:
                     ratio_dict.update(real_dict)
 
                     mr_dict[keyword] = sum(list(ratio_dict.values())[-30:])
-                    dr_dict[keyword] = dict(filter(lambda x: x[0] > latest_date, ratio_dict.items()))
+                    dr_dict[keyword] = dict(dropwhile(lambda x: x[0] <= latest_date, ratio_dict.items()))
                 print(f'{_device}, {_gender}, {_ages} : {mr_dict = }')
                 return dr_dict, mr_dict, res_code
 
