@@ -10,8 +10,9 @@ TOKENPATH = setting_dict.get('TOKENPATH', None)
 
 # BigQuery dataset structure
 PROJECT_NAME = setting_dict.get('PROJECT_NAME', None)
-BASIC_TABLE_NAME = setting_dict.get('BASIC_TABLE_NAME', None)
+DEVICE_TABLE_NAME = setting_dict.get('DEVICE_TABLE_NAME', None)
 GENDER_TABLE_NAME = setting_dict.get("GENDER_TABLE_NAME", None)
+AGE_TABLE_NAME = setting_dict.get("AGE_TABLE_NAME", None)
 
 # Gmail service
 SENDER_EMAIL = setting_dict.get('SENDER_EMAIL', None)
@@ -34,7 +35,7 @@ assert KEYPATH, 'Insert KEYPATH in setting.json file'
 assert OAUTHPATH, 'Insert OAUTHPATH in setting.json file'
 assert TOKENPATH, 'Insert TOKENPATH in setting.json file'
 assert PROJECT_NAME, 'Insert PROJECT_NAME in setting.json file'
-assert BASIC_TABLE_NAME, 'Insert BASIC_TABLE_NAME in setting.json file'
+assert DEVICE_TABLE_NAME, 'Insert BASIC_TABLE_NAME in setting.json file'
 assert GENDER_TABLE_NAME, 'Insert GENDER_TABLE_NAME in setting.json file'
 assert SENDER_EMAIL, 'Insert SENDER_EMAIL in setting.json file'
 assert RECEIVER_EMAIL_LIST, 'Insert RECEIVER_EMAIL_LIST in setting.json file'

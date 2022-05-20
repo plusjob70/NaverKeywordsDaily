@@ -1,7 +1,7 @@
 import os
 import naver_trends.common.queries as queries
 from time import sleep
-from naver_trends.common.uinfo import GENDER_TABLE_NAME, KEYPATH, PROJECT_NAME, BASIC_TABLE_NAME
+from naver_trends.common.uinfo import GENDER_TABLE_NAME, KEYPATH, PROJECT_NAME, DEVICE_TABLE_NAME, AGE_TABLE_NAME
 from google.cloud.bigquery import Client
 from google.cloud.bigquery.schema import SchemaField
 from google.cloud.bigquery.table import Table
@@ -21,12 +21,15 @@ class BigQueryService:
         if schema is not None:
             self.table_schema = [SchemaField(_col, _type) for _col, _type in schema.items()]
 
-        if self.mode == 'basic':
-            self.table_name = BASIC_TABLE_NAME
+        if self.mode == 'device':
+            self.table_name = DEVICE_TABLE_NAME
             self.sep = 'device_type'
         elif self.mode == 'gender':
             self.table_name = GENDER_TABLE_NAME
-            self.sep = 'gender'
+            self.sep = 'gender_type'
+        elif self.mode == 'age':
+            self.table_name = AGE_TABLE_NAME
+            self.sep = 'age_group'
 
     # check dataset existence
     def is_exist_dataset(self, client_name: str):
@@ -70,7 +73,13 @@ class BigQueryService:
 
         if result.total_rows > 0:
             for row in result:
-                sep = row.gender if (self.mode == 'gender') else row.device_type
+                if self.mode == 'device':
+                    sep = row.device_type
+                elif self.mode == 'gender':
+                    sep = row.gender_type
+                else:
+                    sep = row.age_group
+
                 if sep not in latest_date_dict:
                     latest_date_dict[sep] = {}
                 latest_date_dict[sep][row.keyword] = row.latest_date

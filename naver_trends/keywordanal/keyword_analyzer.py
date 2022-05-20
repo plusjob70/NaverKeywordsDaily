@@ -17,7 +17,7 @@ class KeywordAnalyzer(metaclass=ABCMeta):
     def set_latest_date_dict(self, latest_date_dict):
         self.__latest_date_dict = latest_date_dict
 
-    def exceed_daily_request(self, *res_code):
+    def exceed_request_limit(self, *res_code):
         if 429 in res_code:
             print("This user has exceeded the limit of the number of requests. Requesting new user...", flush=True)
             self.client_idx += 1
